@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-db" : "node ./data/db-generate.js",
-    "start" : "node index.js"
+    "generate-db": "node ./data/db-generate.js",
+    "start": "node ./app/data/db-generate.js && node index.js"
   },
   "author": "VainKate & guillaume67450",
   "license": "ISC",
