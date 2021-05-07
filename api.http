@@ -1,0 +1,71 @@
+### GET /v1/channel/:id (success)
+GET http://localhost:8000/v1/channel/1
+
+### GET /v1/channel/:id (404)
+GET http://localhost:8000/v1/channel/1000
+
+### GET /v1/channel/:id (express' 404)
+GET http://localhost:8000/v1/channel/un
+
+#------------------------------------------------
+
+### GET /v1/user/:id (success)
+GET http://localhost:8000/v1/user/1
+
+### GET /v1/user/:id (404)
+GET http://localhost:8000/v1/user/1000
+
+#------------------------------------------------
+
+### GET /v1/tags (success)
+GET http://localhost:8000/v1/tags
+
+#------------------------------------------------
+
+### GET /v1/signup (success)
+POST http://localhost:8000/v1/signup
+Content-Type: application/json
+
+{
+    "email" : "tructrucbis@gmail.com",
+    "password" : "G PA DINSPI",
+    "nickname" : "loulou"
+}
+
+### GET /v1/signup (error, email missing)
+POST http://localhost:8000/v1/signup
+Content-Type: application/json
+
+{
+    "password" : "G PA DINSPI",
+    "nickname" : "loulou"
+}
+
+### GET /v1/signup (error, password missing)
+POST http://localhost:8000/v1/signup
+Content-Type: application/json
+
+{
+    "email" : "pwin@gmail.com",
+    "nickname" : "loulou"
+}
+
+### GET /v1/signup (error, email already used)
+POST http://localhost:8000/v1/signup
+Content-Type: application/json
+
+{
+    "email" : "tructrucbis@gmail.com",
+    "password" : "G PA DINSPI",
+    "nickname" : "loulou"
+}
+
+### GET /v1/signup (error, email value is incorrect)
+POST http://localhost:8000/v1/signup
+Content-Type: application/json
+
+{
+    "email" : "pwin",
+    "password" : "G PA DINSPI",
+    "nickname" : "loulou"
+}
