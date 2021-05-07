@@ -12,10 +12,9 @@ const socketHandler = {
                 }
             }
             */
-            console.log('auth ok')
+            
             socket.join(`channel-${channel.id}`);
-
-            socket.emit('confirm')
+            // socket.emit('confirm')
 
             // key 'user-join' to tell front to add user to user list
             // io.to(`channel-${message.channel.id}`).emit('user-join', {channel, user})
