@@ -3,7 +3,8 @@ require('dotenv').config()
 
 const options = process.env.NODE_ENV === 'production' ? {
     dialectOptions: {
-        ssl: true
+        ssl: true,
+        rejectUnauthorized : false
     },
     define: {
         timestamps: true,
