@@ -31,7 +31,7 @@ let messageIndex = 0;
 
 io.on('connection', socket => {
     socketHandler.auth(socket);
-    socketHandler.message(socket, messageIndex)
+    socketHandler.message(socket, messageIndex);
 })
 
 httpServer.listen(PORT, () => console.log(`Serveur running on http://localhost:${PORT}`));

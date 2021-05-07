@@ -38,7 +38,7 @@ const socketHandler = {
             }
             */
             message.id = messageIndex++
-            console.log('message ok', messageIndex)
+            
             io.to(`channel-${message.channel.id}`).emit('message', message);
         })
     },
