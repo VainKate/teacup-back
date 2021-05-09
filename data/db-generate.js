@@ -10,235 +10,135 @@ const SALT_ROUNDS = 10;
 
 // Don't forget to create a db first and set DATABASE_URL in your .env before running this file
 
-(async _ => {
+(async () => {
     try {
-        await sequelize.sync({ force: true })
+        await sequelize.sync({ force: true });
 
-        await Tag.create({ name: "Cuisine" });
-        await Tag.create({ name: "Horreur" });
-        await Tag.create({ name: "Variété française" });
-        await Tag.create({ name: "Catch" });
-        await Tag.create({ name: "Planche à voile" });
-        await Tag.create({ name: "Films" });
-        await Tag.create({ name: "Comédies Musicales" });
-        await Tag.create({ name: "Mangas/Animes" });
-        await Tag.create({ name: "Poterie" });
-        await Tag.create({ name: "Jeux Vidéos" });
-        await Tag.create({ name: "Action" });
-        await Tag.create({ name: "Jeux de cartes" });
-        await Tag.create({ name: "Jeux de société" });
-        await Tag.create({ name: "Romantique" });
-        await Tag.create({ name: "Séries TV" });
-        await Tag.create({ name: "Mignon" });
-        await Tag.create({ name: "Épique" });
-        await Tag.create({ name: "RPG" });
-        await Tag.create({ name: "Livres" });
-        await Tag.create({ name: "Stratégie" });
-        await Tag.create({ name: "Comédie" });
-        await Tag.create({ name: "Mystère" });
-        await Tag.create({ name: "Réflexion" });
-        await Tag.create({ name: "Enquête" });
-        await Tag.create({ name: "Sport" });
-        await Tag.create({ name: "Comics" });
+        const createdTags = await Tag.bulkCreate([
+            { name: "Cuisine" },
+            { name: "Horreur" },
+            { name: "Variété française" },
+            { name: "Catch" },
+            { name: "Planche à voile" },
+            { name: "Films" },
+            { name: "Comédies Musicales" },
+            { name: "Mangas/Animes" },
+            { name: "Poterie" },
+            { name: "Jeux Vidéos" },
+            { name: "Action" },
+            { name: "Jeux de cartes" },
+            { name: "Jeux de société" },
+            { name: "Romantique" },
+            { name: "Séries TV" },
+            { name: "Mignon" },
+            { name: "Épique" },
+            { name: "RPG" },
+            { name: "Livres" },
+            { name: "Stratégie" },
+            { name: "Comédie" },
+            { name: "Mystère" },
+            { name: "Réflexion" },
+            { name: "Enquête" },
+            { name: "Sport" },
+            { name: "Comics" }
+        ]);
 
-        const chan1 = await Channel.create({ title: "GLOW" });
-        await chan1.reload();
-        await chan1.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Séries TV", "Catch", "Comédie"]
+        const channelMap = [
+            {
+                title: 'GLOW',
+                tags: [{ name: 'Séries TV' }, { name: 'Catch' }, { name: 'Comédie' }]
+            },
+            {
+                title: "The walking dead",
+                tags: [{ name: "Séries TV" }, { name: "Horreur" }, { name: "Action" }, { name: "Comics" }]
+            },
+            {
+                title: "Jeux vidéos d'action",
+                tags: [{ name: "Jeux Vidéos" }, { name: "Action" }]
+            },
+            {
+                title: "Films d'action",
+                tags: [{ name: "Films" }, { name: "Action" }]
+            },
+            {
+                title: "Cats",
+                tags: [{ name: "Films" }, { name: "Comédies Musicales" }]
+            },
+            {
+                title: "School Live/Gakkougurashi",
+                tags: [{ name: "Mignon" }, { name: "Mangas/Animes" }, { name: "Horreur" }]
+            },
+            {
+                title: "Higurashi no naku koro ni",
+                tags: [{ name: "Mignon" }, { name: "Mangas/Animes" }, { name: "Horreur" }, { name: "Mystère" }]
+            },
+            {
+                title: "The Witcher",
+                tags: [{ name: "Jeux Vidéos" }, { name: "Séries TV" }, { name: "Épique" }, { name: "Action" }, { name: "RPG" }, { name: "Livres" }]
+            },
+            {
+                title: "Magic",
+                tags: [{ name: "Jeux de cartes" }, { name: "Stratégie" }, { name: "Réflexion" }]
+            },
+            {
+                title: "Let's create! Pottery VR",
+                tags: [{ name: "Jeux Vidéos" }, { name: "Poterie" }]
+            },
+            {
+                title: 'Danganronpa',
+                tags: [{ name: "Jeux Vidéos" }, { name: "Mangas/Animes" }, { name: "Horreur" }, { name: "Enquête" }, { name: "Réflexion" }]
+            },
+            {
+                title: "Crazy Ex-Girlfriend",
+                tags: [{ name: "Série TV" }, { name: "Comédies Musicales" }, { name: "Comédie" }, { name: "Romantique" }]
+            },
+            {
+                title: "Dixit",
+                tags: [{ name: "Jeux de société" }, { name: "Réflexion" }]
+            },
+            {
+                title: "Fiesta de los Muertos",
+                tags: [{ name: "Jeux de société" }, { name: "Réflexion" }]
+            },
+            {
+                title: "Muertigos",
+                tags: [{ name: "Jeux de société" }, { name: "Réflexion" }, { name: "Jeux Vidéos" }]
+            },
+            {
+                title: "Portal",
+                tags: [{ name: "Réflexion" }, { name: "Jeux Vidéos" }]
+            },
+            {
+                title: "Les pires horreurs en cuisine",
+                tags: [{ name: "Cuisine" }, { name: "Horreur" }]
+            },
+            {
+                title: "Le meilleur du catch à coup de planche à voile !",
+                tags: [{ name: "Catch" }, { name: "Planche à voile" }, { name: "Sport" }]
+            },
+            {
+                title: "Phoenix Wright/Ace Attorney",
+                tags: [{ name: "Jeux Vidéos" }, { name: "Mangas/Animes" }, { name: "Épique" }, { name: "Enquête" }, { name: "Réflexion" }]
+            },
+        ];
+
+        const defaultChannels = createdTags.map((tag) => { return { title: tag.name, tags: [{ name: tag.name }] }});
+
+        const createdChannels = [];
+
+        for (const { title, tags } of [...channelMap, ...defaultChannels]) {
+            const channel = await Channel.create({ title });
+            for (const tag of tags) {
+                const matchingTag = createdTags.findIndex((createdTag) => createdTag.dataValues.name === tag.name);
+                if (matchingTag !== -1) {
+                    await channel.addTag(createdTags[matchingTag].dataValues.id);
                 }
             }
-        }));
-
-        const chan2 = await Channel.create({ title: "The walking dead" });
-        await chan2.reload();
-        await chan2.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Séries TV", "Horreur", "Action", "Comics"]
-                }
-            }
-        }));
-
-        const chan3 = await Channel.create({ title: "Jeux vidéos d'action" });
-        await chan3.reload();
-        await chan3.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux Vidéos", "Action"]
-                }
-            }
-        }));
-
-        const chan4 = await Channel.create({ title: "Films d'action" });
-        await chan4.reload();
-        await chan4.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Films", "Action"]
-                }
-            }
-        }));
-
-        const chan5 = await Channel.create({ title: "Cats" });
-        await chan5.reload();
-        await chan5.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Films", "Comédies Musicales"]
-                }
-            }
-        }));
-
-        const chan6 = await Channel.create({ title: "School Live/Gakkougurashi" });
-        await chan6.reload();
-        await chan6.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Mignon", "Mangas/Animes", "Horreur"]
-                }
-            }
-        }));
-
-        const chan7 = await Channel.create({ title: "Higurashi no naku koro ni" });
-        await chan7.reload();
-        await chan7.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Mignon", "Mangas/Animes", "Horreur", "Mystère"]
-                }
-            }
-        }));
-
-        const chan8 = await Channel.create({ title: "The Witcher" });
-        await chan8.reload();
-        await chan8.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux Vidéos", "Séries TV", "Épique", "Action", "RPG", "Livres"]
-                }
-            }
-        }));
-
-        const chan9 = await Channel.create({ title: "Magic" });
-        await chan9.reload();
-        await chan9.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux de cartes", "Stratégie", "Réflexion"]
-                }
-            }
-        }));
-
-        const chan10 = await Channel.create({ title: "Let's create! Pottery VR" });
-        await chan10.reload();
-        await chan10.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux Vidéos", "Poterie"]
-                }
-            }
-        }));
-
-        const chan11 = await Channel.create({ title: "Danganronpa" });
-        await chan11.reload();
-        await chan11.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux Vidéos", "Mangas/Animes", "Horreur", "Enquête", "Réflexion"]
-                }
-            }
-        }));
-
-        const chan12 = await Channel.create({ title: "Crazy Ex-Girlfriend" });
-        await chan12.reload();
-        await chan12.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Série TV", "Comédies Musicales", "Comédie", "Romantique"]
-                }
-            }
-        }));
-
-        const chan13 = await Channel.create({ title: "Dixit" });
-        await chan13.reload();
-        await chan13.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux de société", "Réflexion"]
-                }
-            }
-        }));
-
-        const chan14 = await Channel.create({ title: "Fiesta de los Muertos" });
-        await chan14.reload();
-        await chan14.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux de société", "Réflexion"]
-                }
-            }
-        }));
-
-        const chan15 = await Channel.create({ title: "Muertigos" });
-        await chan15.reload();
-        await chan15.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux de société", "Réflexion", "Jeux Vidéos"]
-                }
-            }
-        }));
-
-        const chan16 = await Channel.create({ title: "Portal" });
-        await chan16.reload();
-        await chan16.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Réflexion", "Jeux Vidéos"]
-                }
-            }
-        }));
-
-        const chan17 = await Channel.create({ title: "Les pires horreurs en cuisine" });
-        await chan17.reload();
-        await chan17.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Cuisine", "Horreur"]
-                }
-            }
-        }));
-
-        const chan18 = await Channel.create({ title: "Le meilleur du catch à coup de planche à voile !" });
-        await chan18.reload();
-        await chan18.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Catch", "Planche à voile", "Sport"]
-                }
-            }
-        }));
-
-        const chan19 = await Channel.create({ title: "Phoenix Wright/Ace Attorney" });
-        await chan19.reload();
-        await chan19.addTag(await Tag.findAll({
-            where: {
-                name: {
-                    [Op.or]: ["Jeux Vidéos", "Mangas/Animes", "Épique", "Enquête", "Réflexion"]
-                }
-            }
-        }));
-
-
-        for (const tag of await Tag.findAll()) {
-            const newChannel = await Channel.create({ title: tag.name });
-            await newChannel.reload();
-
-            await newChannel.addTag(tag);
+            await channel.save();
+            createdChannels.push(channel);
         }
 
+        /*
         for (let index = 0; index < 35; index++) {
             const newUser = await User.create({
                 email: faker.internet.email(),
@@ -278,17 +178,17 @@ const SALT_ROUNDS = 10;
                         attributes: [],
                     },
                     where: {
-                        id: 
+                        id:
                         {
                             [Op.not]: userTags.map(({ id }) => id)
                         }
                     }
                 },
                 order: sequelize.random(),
-                limit: Math.round(Math.random() * userChannels.length/3)
+                limit: Math.round(Math.random() * userChannels.length / 3)
             }));
         }
-
+        */
     }
 
     catch (err) {
