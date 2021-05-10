@@ -1,5 +1,5 @@
 const socketHandler = {
-    auth: socket => {
+    auth: (socket) => {
         socket.on('auth', ({ channel/*, user*/ }) => {
             /*
             {
@@ -22,7 +22,7 @@ const socketHandler = {
         })
     },
 
-    message: (socket, messageIndex) => {
+    message: (socket, io) => {
         socket.on('message', message => {
             /*
             {
@@ -37,7 +37,7 @@ const socketHandler = {
                 content : string
             }
             */
-            message.id = messageIndex++
+            message.id = `${user.id}-${new Date()}`
             
             io.to(`channel-${message.channel.id}`).emit('message', message);
         })

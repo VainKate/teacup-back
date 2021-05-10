@@ -27,11 +27,9 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use('/v1', apiRouter);
 
-let messageIndex = 0;
-
 io.on('connection', socket => {
     socketHandler.auth(socket);
-    socketHandler.message(socket, messageIndex);
+    socketHandler.message(socket, io);
 })
 
 httpServer.listen(PORT, () => console.log(`Serveur running on http://localhost:${PORT}`));
