@@ -22,6 +22,18 @@ const channelController = {
         catch (err) {
             res.status(500).send(err.message);
         }
+    },
+
+    getAllChannels: async (req, res) => {
+        try {
+            const channels = await Channel.findAll();
+
+            return res.json(channel);
+        }
+
+        catch (err) {
+            res.status(500).send(err.message);
+        }
     }
 }
 
