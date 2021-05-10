@@ -6,6 +6,7 @@ const { authController, channelController, tagController } = require("./controll
 
 // [post] route for signup registration
 router.post("/signup", authController.signup);
+router.post("/login", authController.login);
 
 router.get('/channel/:id(\\d+)', channelController.getChannelById);
 
