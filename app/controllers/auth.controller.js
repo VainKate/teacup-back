@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const { User } = require("../models");
+=======
+const { User, Channel } = require("../models");
+>>>>>>> bc5d49d6ad75bcda1adeb9e205a27f24a2be5efa
 let bcrypt = require("bcrypt");
 
 const authController = {
@@ -86,7 +90,11 @@ const authController = {
                 ? await bcrypt.compare(password, user.password)
                 : false;
 
+<<<<<<< HEAD
             if (!user || !same) {
+=======
+            if (!user || !isPasswordValid) {
+>>>>>>> bc5d49d6ad75bcda1adeb9e205a27f24a2be5efa
                 return res.status(409).send(`Your credentials are invalid.`);
             }
 
@@ -102,11 +110,18 @@ const authController = {
                 },
             });
 
+<<<<<<< HEAD
             const userWithRecommendations = { ...user };
 
             userWithRecommendations.recommendedChannels = recommendedChannels;
 
             return res.json(userWithRecommendations);
+=======
+            const userWithRecommendations = [{ user }, { recommendedChannels }]
+
+            res.json(userWithRecommendations)
+
+>>>>>>> bc5d49d6ad75bcda1adeb9e205a27f24a2be5efa
         } catch (error) {
             return res.status(400).send(error.message);
         }
