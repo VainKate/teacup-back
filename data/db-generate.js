@@ -122,73 +122,81 @@ const SALT_ROUNDS = 10;
             },
         ];
 
-        const defaultChannels = createdTags.map((tag) => { return { title: tag.name, tags: [{ name: tag.name }] }});
+        const defaultChannels = createdTags.map((tag) => { return { title: tag.name, tags: [{ name: tag.name }] } });
 
         const createdChannels = [];
 
         for (const { title, tags } of [...channelMap, ...defaultChannels]) {
             const channel = await Channel.create({ title });
+            const channelTags = []
+
             for (const tag of tags) {
-                const matchingTag = createdTags.findIndex((createdTag) => createdTag.dataValues.name === tag.name);
-                if (matchingTag !== -1) {
-                    await channel.addTag(createdTags[matchingTag].dataValues.id);
+                const matchingTag = createdTags.find((createdTag) => createdTag.dataValues.name === tag.name);
+                if (matchingTag) {
+                    await channel.addTag(matchingTag.dataValues.id);
+                    channelTags.push(matchingTag)
                 }
             }
             await channel.save();
-            createdChannels.push(channel);
-        }
+            createdChannels.push({ channel, tags: channelTags });
+        };
 
-        /*
-        for (let index = 0; index < 35; index++) {
+        for (let index = 0; index < 50; index++) {
             const newUser = await User.create({
                 email: faker.internet.email(),
                 password: await bcrypt.hash(faker.internet.password(), SALT_ROUNDS),
                 nickname: faker.internet.userName()
             });
 
-            await newUser.reload();
+            const tagCount = Math.round(Math.random() * (11 - 1) + 1);
+            const userTags = [];
 
-            await newUser.addTag(await Tag.findAll({
-                order: sequelize.random(),
-                limit: Math.round(Math.random() * (11 - 1) + 1)
-            }));
+            for (let index = 1; index <= tagCount; index++) {
+                const randomIndex = Math.floor(Math.random() * createdTags.length);
 
-            const userTags = await newUser.getTags();
+                if (createdTags[randomIndex] && !userTags.includes(createdTags[randomIndex])) {
+                    await newUser.addTag(createdTags[randomIndex]);
+                    userTags.push(createdTags[randomIndex]);
+                }
+            }
 
-            await newUser.addChannel(await Channel.findAll({
-                include: {
-                    association: "tags",
-                    through: {
-                        attributes: [],
-                    },
-                    where: {
-                        id: userTags.map(({ id }) => id)
+            const recommendedChannels = [];
+            const otherChannels = [];
+
+            for (const userTag of userTags) {
+
+                for (const { channel, tags } of createdChannels) {
+
+                    const matchingTag = tags.find(channelTag => channelTag.dataValues.name === userTag.dataValues.name);
+
+                    if (matchingTag) {
+                        recommendedChannels.push(channel)
+
+                    } else {
+                        otherChannels.push(channel)
+
                     }
-                },
-                order: sequelize.random(),
-                limit: Math.round(Math.random() * (userTags.length - 3) + 3)
-            }));
+                }
+            };
 
-            const userChannels = await newUser.getChannels()
+            const recommendedChannelsCount = Math.round(Math.random() * (userTags.length - 2) + 2);
+            const otherChannelsCount = Math.round(Math.random() * recommendedChannelsCount / 3);
 
-            await newUser.addChannel(await Channel.findAll({
-                include: {
-                    association: "tags",
-                    through: {
-                        attributes: [],
-                    },
-                    where: {
-                        id:
-                        {
-                            [Op.not]: userTags.map(({ id }) => id)
-                        }
-                    }
-                },
-                order: sequelize.random(),
-                limit: Math.round(Math.random() * userChannels.length / 3)
-            }));
+            for (let index = 0; index <= recommendedChannelsCount; index++) {
+                const randomChannelIndex = Math.floor(Math.random() * recommendedChannels.length);
+
+                await newUser.addChannel(recommendedChannels[randomChannelIndex].dataValues.id);
+            };
+
+            for (let index = 0; index <= otherChannelsCount; index++) {
+                const randomChannelIndex = Math.floor(Math.random() * otherChannels.length);
+
+                await newUser.addChannel(otherChannels[randomChannelIndex].dataValues.id);
+            };
+
+            await newUser.save();
         }
-        */
+
     }
 
     catch (err) {
