@@ -24,11 +24,18 @@ const channelController = {
         }
     },
 
-    getAllChannels: async (req, res) => {
+    getAllChannels: async (_, res) => {
         try {
-            const channels = await Channel.findAll();
+            const channels = await Channel.findAll({
+                include : {
+                    association : 'tags',
+                    through : {
+                        attributes : []
+                    }
+                }
+            });
 
-            return res.json(channel);
+            return res.json(channels);
         }
 
         catch (err) {
