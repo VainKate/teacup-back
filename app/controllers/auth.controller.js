@@ -102,7 +102,7 @@ const authController = {
                 },
             });
 
-            const userWithRecommendations = [{user}, {recommendedChannels}]
+            const userWithRecommendations = [{ user }, { recommendedChannels }]
 
             res.json(userWithRecommendations)
 
