@@ -1,24 +1,37 @@
+const { Channel, User } = require('../models');
+
 const socketHandler = {
-    auth: (socket) => {
-        socket.on('auth', ({ channel/*, user*/ }) => {
+    auth: (socket, io) => {
+        socket.on('auth', async ({ channel, user }) => {
             /*
             {
                 user : {
                     id : number,
                     nickname : string
+                    -- prévoir un boolean alreadyJoined
                 }
                 channel : {
                     id : number
                 }
             }
             */
-            
+
             socket.join(`channel-${channel.id}`);
-            // socket.emit('confirm')
+            socket.emit('confirm');
 
             // key 'user-join' to tell front to add user to user list
-            // io.to(`channel-${message.channel.id}`).emit('user-join', {channel, user})
-            // Channel.addUser(User.findByPk(user.id))
+            io.to(`channel-${message.channel.id}`).emit('user-join', { channel, user });
+
+            try {
+                if (!user.alreadyJoined) {
+                    Channel.findByPk(channel.id).addUser(User.findByPk(user.id));
+                }
+            }
+
+            catch (err) {
+                console.error(err);
+            }
+
         })
     },
 
@@ -38,15 +51,18 @@ const socketHandler = {
             }
             */
             message.id = `${user.id}-${new Date()}`
-            
+
             io.to(`channel-${message.channel.id}`).emit('message', message);
         })
     },
 
-    // socket.on('disconnect', ({ channel, user }) => {
-    //     // key 'user-join' to tell front to add user to user list
-    //     io.to(`channel-${channel.id}`).emit('user-leave', {channel, user});
-    // })
+    disconnect: (socket, io) => {
+        socket.on('disconnect', ({ channel, user }) => {
+
+            // key 'user-leave' to tell front to shift user from online user list to offline user list
+            io.to(`channel-${channel.id}`).emit('user-leave', { channel, user });
+        })
+    }
 };
 
 module.exports = socketHandler;
