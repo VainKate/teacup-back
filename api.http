@@ -22,6 +22,17 @@ GET http://localhost:8000/v1/tags
 
 #------------------------------------------------
 
+### GET /v1/login (success)
+POST http://localhost:8000/v1/login
+Content-Type: application/json
+
+{
+    "email" : "tructrucbis@gmail.com",
+    "password" : "G PA DINSPI"
+}
+
+#------------------------------------------------
+
 ### GET /v1/signup (success)
 POST http://localhost:8000/v1/signup
 Content-Type: application/json
