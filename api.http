@@ -31,6 +31,40 @@ Content-Type: application/json
     "password" : "G PA DINSPI"
 }
 
+### GET /v1/signup (error, email missing)
+POST http://localhost:8000/v1/signup
+Content-Type: application/json
+
+{
+    "password" : "G PA DINSPI"
+}
+
+### GET /v1/signup (error, password missing)
+POST http://localhost:8000/v1/signup
+Content-Type: application/json
+
+{
+    "email" : "tructrucbis@gmail.com"
+}
+
+### GET /v1/login (error, user does not exist)
+POST http://localhost:8000/v1/login
+Content-Type: application/json
+
+{
+    "email" : "trucmachin@gmail.com",
+    "password" : "G PA DINSPI"
+}
+
+### GET /v1/login (error, incorrect password)
+POST http://localhost:8000/v1/login
+Content-Type: application/json
+
+{
+    "email" : "tructrucbis@gmail.com",
+    "password" : "G (toujours) PA DINSPI"
+}
+
 #------------------------------------------------
 
 ### GET /v1/signup (success)

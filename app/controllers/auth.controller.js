@@ -106,11 +106,6 @@ const authController = {
 
             res.json(userWithRecommendations)
 
-            // const userWithRecommendations = { ...user };
-
-            // userWithRecommendations.recommendedChannels = recommendedChannels;
-
-            // return res.json(userWithRecommendations);
         } catch (error) {
             return res.status(400).send(error.message);
         }
