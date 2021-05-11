@@ -51,7 +51,7 @@ const socketHandler = {
                 content : string
             }
             */
-            message.id = `${message.user.id}-${new Date()}`
+            message.id = `${message.user.id}-${Date.now()}`
 
             io.to(`channel-${message.channel.id}`).emit('message', message);
         })
