@@ -20,11 +20,12 @@ const socketHandler = {
             socket.emit('confirm');
 
             // key 'user-join' to tell front to add user to user list
-            io.to(`channel-${message.channel.id}`).emit('user-join', { channel, user });
+            io.to(`channel-${channel.id}`).emit('user-join', { channel, user });
 
             try {
                 if (!user.alreadyJoined) {
-                    Channel.findByPk(channel.id).addUser(User.findByPk(user.id));
+                    const channelJoined = await Channel.findByPk(channel.id);
+                    channelJoined.addUser(await User.findByPk(user.id));
                 }
             }
 
@@ -50,7 +51,7 @@ const socketHandler = {
                 content : string
             }
             */
-            message.id = `${user.id}-${new Date()}`
+            message.id = `${message.user.id}-${new Date()}`
 
             io.to(`channel-${message.channel.id}`).emit('message', message);
         })
