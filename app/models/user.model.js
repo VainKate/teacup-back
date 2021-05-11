@@ -1,6 +1,13 @@
 module.exports = (sequelize, DataTypes, Model) => {
 
-    class User extends Model { };
+    class User extends Model {
+        toJSON = () => {
+            let values = Object.assign({}, this.get());
+
+            delete values.password;
+            return values;
+        }
+     };
 
     User.init({
         nickname: {
