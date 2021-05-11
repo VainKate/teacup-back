@@ -61,7 +61,9 @@ const socketHandler = {
         socket.on('disconnect', ({ channel, user }) => {
 
             // key 'user-leave' to tell front to shift user from online user list to offline user list
-            io.to(`channel-${channel.id}`).emit('user-leave', { channel, user });
+            // io.to(`channel-${channel.id}`).emit('user-leave', { channel, user });
+
+            console.log("user disconnect")
         })
     }
 };
