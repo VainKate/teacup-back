@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 
-const { authController, channelController, tagController } = require("./controllers");
+const { authController, channelController, tagController, userController } = require("./controllers");
 
 
 // [post] route for signup registration
@@ -12,7 +12,7 @@ router.get('/channel/:id(\\d+)', channelController.getChannelById);
 
 router.get('/tags', tagController.getAllTags);
 
-router.put('/:id', update);
+router.put('/:id', userController.update);
 
 
 module.exports = router;

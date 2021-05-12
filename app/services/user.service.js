@@ -4,20 +4,27 @@ module.exports = {
     update,
 };
 
-const { email, nickname, password } = req.body;
-
-async function update(id) {
+async function update(id, params) {
+    
     const user = await getUser(id);
 
     // validate
-    const nicknameChanged = nickname !== user.username;
-    if (nicknameChanged && await User.findOne({ where: { nickname: nickname } })) {
-        throw 'Username "' + nickname + '" is already taken';
+    const nicknameChanged = params.nickname && user.nickname !== params.nickname;
+    if (nicknameChanged && await User.findOne({ where: { nickname: params.nickname } })) {
+        throw 'nickname "' + params.nickname + '" is already taken';
     }
 
     // copy params to user and save
-    Object.assign(user);
+    Object.assign(user, params);
     await user.save();
 
-    return(user.get());
+    return(user);
 }    
+
+// helper functions
+
+async function getUser(id) {
+    const user = await User.findByPk(id);
+    if (!user) throw 'User not found';
+    return user;
+}

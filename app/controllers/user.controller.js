@@ -1,3 +1,5 @@
+const userService = require('../services/user.service');
+
 const userController = {
     update(req, res, next) {
         userService
@@ -6,3 +8,5 @@ const userController = {
             .catch(next);
     },
 };
+
+module.exports = userController;
