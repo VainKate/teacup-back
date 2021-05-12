@@ -1,13 +1,6 @@
 module.exports = (sequelize, DataTypes, Model) => {
 
-    class User extends Model {
-        // static toJSON() {
-        //     let values = Object.assign({}, this.get());
-
-        //     delete values.password;
-        //     return values;
-        // }
-    };
+    class User extends Model { };
 
     User.init({
         nickname: {
@@ -33,15 +26,15 @@ module.exports = (sequelize, DataTypes, Model) => {
         sequelize,
         modelName: 'User',
         tableName: 'user',
-        defaultScope : {
-            attributes : {
-                exclude : ['password']
+        defaultScope: {
+            attributes: {
+                exclude: ['password']
             }
         },
-        scopes : {
+        scopes: {
             withPassword: {
-                attributes : {
-                    include : ['password']
+                attributes: {
+                    include: ['password']
                 }
             }
         }
