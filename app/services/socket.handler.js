@@ -1,18 +1,5 @@
 const { Channel, User } = require('../models');
-
-const redis = require('redis');
-const client = redis.createClient();
-
-const PREFIX = 'teacup:'
-
-const { promisify } = require('util');
-
-const asyncClient = {
-    exists: promisify(client.exists).bind(client),
-    zadd: promisify(client.zadd).bind(client),
-    zrange: promisify(client.zrange).bind(client),
-    zrem: promisify(client.zrem).bind(client)
-};
+const usersStatus = require('./usersStatus.service');
 
 const socketHandler = {
     auth: (socket, io) => {
@@ -22,7 +9,7 @@ const socketHandler = {
                 user : {
                     id : number,
                     nickname : string
-                    alreadyJoined : boolean (not implemented yet)
+                    alreadyJoined : boolean (not implemented yet) -- to get this information, front should browse through offline lists to seek if user is in it
                 },
                 channel : {
                     id : number
@@ -40,36 +27,33 @@ const socketHandler = {
                 ]
             }
             */
-            const channelKey = `channel-${channel.id}`
+            const channelKey = `channel-${channel.id}`;
+            // const userKey = `user${user.id}-${user.nickname}`
+
+            // console.log('before join', socket.rooms);
 
             socket.join(channelKey);
-            // Add the user to online users list of the channel
+
+            console.log('after join', socket.rooms);
 
             // send confirmation to front that user had join the channel
             socket.emit('confirm');
 
             // key 'user-join' to tell front to add user to online user list
-            // io.to(`channel-${channel.id}`).emit('user-join', { channel, user });
+            io.to(`channel-${channel.id}`).emit('user-join', { channel, user });
 
-            await asyncClient.zadd(PREFIX + channelKey, user.id, user.nickname);
-            const onlineUsers = await asyncClient.zrange(PREFIX + channelKey, 0, -1)
+            try {
+                if (!user.alreadyJoined) {
+                    // const channelJoined = await Channel.findByPk(channel.id);
+                    // channelJoined.addUser(await User.findByPk(user.id));
 
-            console.log(onlineUsers)
+                } 
+                await usersStatus.addToOnlineList(channelKey, user.id);
+            }
 
-            // Instead of just send the user that joined, send all users online.
-            // ? Should user alone be send too ?
-            io.to(`channel-${channel.id}`).emit('user-join', { channel, onlineUsers });
-
-            // try {
-            //     if (!user.alreadyJoined) {
-            //         const channelJoined = await Channel.findByPk(channel.id);
-            //         channelJoined.addUser(await User.findByPk(user.id));
-            //     }
-            // }
-
-            // catch (err) {
-            //     console.error(err);
-            // }
+            catch (err) {
+                console.error(err);
+            }
 
         })
     },
@@ -97,17 +81,29 @@ const socketHandler = {
 
     disconnecting: (socket, io) => {
         socket.on('disconnecting', async ({ channel, user }) => {
-            console.log(socket.rooms)
+            // console.log('on disconnecting', socket.rooms)
+            // const userKey = `user${user.id}-${user.nickname}`
 
-            const channelKey = `channel-${channel.id}`;
+            const channelKey = [...socket.rooms][1];
+
+            console.log(socket.rooms)
+            console.log(socket.id)
+
+            await usersStatus.removeFromOnlineList(channelKey, '1')
 
             // key 'user-leave' to tell front to shift user from online user list to offline user list
             // io.to(channelKey).emit('user-leave', { channel, user });
 
-            await asyncClient.zrem(PREFIX + channelKey, user.nickname);
+            // try {
+            //     await usersStatus.switchUserStatus(channelKey, userKey, 'offline');
 
-            console.log("user disconnect");
-            console.log(await asyncClient.zrange(PREFIX + channelKey, 0, -1));
+                console.log("user disconnect");
+            // }
+
+            // catch (err) {
+            //     console.error(err);
+            // }
+
         })
     }
 };

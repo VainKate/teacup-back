@@ -1,5 +1,5 @@
 ### GET /v1/channel/:id (success)
-GET http://localhost:8000/v1/channel/1
+GET http://localhost:8000/v1/channel/9
 
 ### GET /v1/channel/:id (404)
 GET http://localhost:8000/v1/channel/1000
