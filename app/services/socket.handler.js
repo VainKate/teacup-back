@@ -31,8 +31,6 @@ const socketHandler = {
 
             socket.join(channelKey);
 
-            console.log('after join', socket.rooms);
-
             // send confirmation to front that user had join the channel
             socket.emit('confirm');
 
@@ -49,7 +47,6 @@ const socketHandler = {
 
                 await usersStatus.addSocketToList(channelKey, socket.id, user.id)
 
-                console.log('sockets on join', await usersStatus.getSocketsByChannel(channelKey))
             }
 
             catch (err) {
@@ -83,7 +80,6 @@ const socketHandler = {
     disconnecting: (socket, io) => {
         socket.on('disconnecting', async () => {
             try {
-                console.log(socket.rooms)
                 const channelKey = [...socket.rooms][1];
                 const socketsList = await usersStatus.checkSockets(channelKey, socket.id);
                 const userId = socketsList[1]
@@ -102,20 +98,10 @@ const socketHandler = {
                         }
                     });
 
-                    console.log({
-                        channel: {
-                            id: parseInt(channelKey.slice(8))
-                        },
-                        user: {
-                            id: parseInt(userId)
-                        }
-                    })
-
-                    console.log("user disconnect");
                 }
 
                 await usersStatus.removeSocketFromList(channelKey, socket.id)
-                console.log(socket.rooms)
+
             }
 
             catch (err) {
