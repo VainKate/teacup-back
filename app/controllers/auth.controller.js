@@ -61,7 +61,7 @@ const authController = {
                     );
             }
 
-            const user = await User.findOne({
+            const user = await User.scope('withPassword').findOne({
                 include: [
                     {
                         association: "tags",

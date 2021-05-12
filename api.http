@@ -27,11 +27,11 @@ POST http://localhost:8000/v1/login
 Content-Type: application/json
 
 {
-    "email" : "tructrucbis@gmail.com",
-    "password" : "G PA DINSPI"
+    "email" : "testeur@testmail.com",
+    "password" : "7357"
 }
 
-### GET /v1/signup (error, email missing)
+### GET /v1/login (error, email missing)
 POST http://localhost:8000/v1/login
 Content-Type: application/json
 
@@ -39,7 +39,7 @@ Content-Type: application/json
     "password" : "G PA DINSPI"
 }
 
-### GET /v1/signup (error, password missing)
+### GET /v1/login (error, password missing)
 POST http://localhost:8000/v1/login
 Content-Type: application/json
 
@@ -72,7 +72,7 @@ POST http://localhost:8000/v1/signup
 Content-Type: application/json
 
 {
-    "email" : "tructrucbis@gmail.com",
+    "email" : "tructructer@gmail.com",
     "password" : "G PA DINSPI",
     "nickname" : "loulou"
 }

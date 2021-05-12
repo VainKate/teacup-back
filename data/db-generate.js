@@ -197,6 +197,56 @@ const SALT_ROUNDS = 10;
             await newUser.save();
         }
 
+        const testUser = await User.create({
+            email: "testeur@testmail.com",
+            password: await bcrypt.hash("7357", SALT_ROUNDS),
+            nickname: "le serial testeur"
+        });
+
+            const testUserTags = [];
+
+            for (let index = 1; index <= 9; index++) {
+                const randomIndex = Math.floor(Math.random() * createdTags.length);
+
+                if (createdTags[randomIndex] && !testUserTags.includes(createdTags[randomIndex])) {
+                    await testUser.addTag(createdTags[randomIndex]);
+                    testUserTags.push(createdTags[randomIndex]);
+                }
+            }
+
+            const recommendedChannels = [];
+            const otherChannels = [];
+
+            for (const userTag of testUserTags) {
+
+                for (const { channel, tags } of createdChannels) {
+
+                    const matchingTag = tags.find(channelTag => channelTag.dataValues.name === userTag.dataValues.name);
+
+                    if (matchingTag) {
+                        recommendedChannels.push(channel)
+
+                    } else {
+                        otherChannels.push(channel)
+
+                    }
+                }
+            };
+
+            for (let index = 0; index <= 5; index++) {
+                const randomChannelIndex = Math.floor(Math.random() * recommendedChannels.length);
+
+                await testUser.addChannel(recommendedChannels[randomChannelIndex].dataValues.id);
+            };
+
+            for (let index = 0; index <= 2; index++) {
+                const randomChannelIndex = Math.floor(Math.random() * otherChannels.length);
+
+                await testUser.addChannel(otherChannels[randomChannelIndex].dataValues.id);
+            };
+
+            await testUser.save();
+
     }
 
     catch (err) {
