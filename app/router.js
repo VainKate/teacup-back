@@ -12,5 +12,7 @@ router.get('/channel/:id(\\d+)', channelController.getChannelById);
 
 router.get('/tags', tagController.getAllTags);
 
+router.put('/:id', update);
+
 
 module.exports = router;
