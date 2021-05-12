@@ -9,7 +9,6 @@ const socketHandler = {
                 user : {
                     id : number,
                     nickname : string
-                    alreadyJoined : boolean (not implemented yet) -- to get this information, front should browse through offline lists to seek if user is in it
                 },
                 channel : {
                     id : number
@@ -29,30 +28,25 @@ const socketHandler = {
             */
             const channelKey = `channel-${channel.id}`;
 
-            socket.join(channelKey);
-
-            // send confirmation to front that user had join the channel
-            socket.emit('confirm');
-
-            // key 'user-join' to tell front to add user to online user list
-            io.to(`channel-${channel.id}`).emit('user-join', { channel, user });
-
             try {
-                if (!user.alreadyJoined) {
-                    // const channelJoined = await Channel.findByPk(channel.id);
-                    // channelJoined.addUser(await User.findByPk(user.id));
+                socket.join(channelKey);
 
-                }
+                const channel = await Channel.findByPk(channel.id);
+                await channel.addUser(user.id);
+
                 await usersStatus.addToOnlineList(channelKey, user.id);
 
                 await usersStatus.addSocketToList(channelKey, socket.id, user.id)
 
-            }
+                // send confirmation to front that user had join the channel
+                socket.emit('confirm');
 
-            catch (err) {
-                console.error(err);
-            }
+                // key 'user-join' to tell front to add user to online user list
+                io.to(channelKey).emit('user:join', { channel, user });
 
+            } catch (err) {
+                socket.emit('error');
+            }
         })
     },
 
@@ -80,7 +74,12 @@ const socketHandler = {
     disconnecting: (socket, io) => {
         socket.on('disconnecting', async () => {
             try {
-                const channelKey = [...socket.rooms][1];
+                const channelKey = [...socket.rooms][1] || null;
+
+                if (!channelKey) {
+                    return;
+                }
+
                 const socketsList = await usersStatus.checkSockets(channelKey, socket.id);
                 const userId = socketsList[1]
 
@@ -89,7 +88,7 @@ const socketHandler = {
                     await usersStatus.removeFromOnlineList(channelKey, userId);
 
                     // key 'user-leave' to tell front to shift user from online user list to offline user list
-                    io.to(channelKey).emit('user-leave', {
+                    io.to(channelKey).emit('user:leave', {
                         channel: {
                             id: parseInt(channelKey.slice(8))
                         },
@@ -102,10 +101,8 @@ const socketHandler = {
 
                 await usersStatus.removeSocketFromList(channelKey, socket.id)
 
-            }
-
-            catch (err) {
-                console.error(err);
+            } catch (err) {
+                socket.emit('error');
             }
 
         })
