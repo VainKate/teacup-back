@@ -12,7 +12,8 @@ router.get('/channel/:id(\\d+)', channelController.getChannelById);
 
 router.get('/tags', tagController.getAllTags);
 
-router.put('/:id', userController.update);
+// [put] route for update user
+router.put('/users/:id', userController.update);
 
 
 module.exports = router;

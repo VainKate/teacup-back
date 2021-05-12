@@ -24,7 +24,21 @@ async function update(id, params) {
 // helper functions
 
 async function getUser(id) {
-    const user = await User.findByPk(id);
+    const user = await User.scope('withPassword').findOne({
+        include: [
+            {
+                association: "tags",
+                through: {
+                    attributes: [],
+                },
+            },
+
+        ],
+
+        where: {
+            id,
+        },
+    });
     if (!user) throw 'User not found';
     return user;
 }
