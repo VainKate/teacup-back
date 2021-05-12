@@ -8,8 +8,12 @@ const { promisify } = require('util');
 const asyncClient = {
     sadd: promisify(client.sadd).bind(client),
     srem: promisify(client.srem).bind(client),
-    smove: promisify(client.smove).bind(client),
     smembers: promisify(client.smembers).bind(client),
+    zadd: promisify(client.zadd).bind(client),
+    zrem: promisify(client.zrem).bind(client),
+    zrange: promisify(client.zrange).bind(client),
+    zscore: promisify(client.zscore).bind(client),
+    zrangebyscore: promisify(client.zrangebyscore).bind(client),
 };
 
 const usersStatus = {
@@ -25,6 +29,34 @@ const usersStatus = {
         const users = await asyncClient.smembers(`${PREFIX + channelKey}-online`)
 
         return users
+    },
+
+    addSocketToList: async (channelKey, socket, userId) => {
+        await asyncClient.zadd(`${PREFIX + channelKey}-sockets`, userId, socket);
+    },
+
+    removeSocketFromList : async (channelKey, socket) => {
+        await asyncClient.zrem(`${PREFIX + channelKey}-sockets`, socket)
+    },
+
+    getSocketsByChannel: async (channelKey) => {
+        const sockets = await asyncClient.zrange(`${PREFIX + channelKey}-sockets`, 0, -1)
+
+        return sockets
+    },
+
+    getUserIdFromSocket : async (channelKey, socket) => {
+        const userId = await asyncClient.zscore(`${PREFIX + channelKey}-sockets`, socket)
+
+        return userId
+    },
+
+    checkSockets : async (channelKey, socket) => {
+        const userId = await asyncClient.zscore(`${PREFIX + channelKey}-sockets`, socket)
+
+        const sockets = await asyncClient.zrangebyscore(`${PREFIX + channelKey}-sockets`, userId, userId, "WITHSCORES");
+
+        return sockets;
     }
 }
 

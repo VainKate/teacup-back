@@ -28,9 +28,6 @@ const socketHandler = {
             }
             */
             const channelKey = `channel-${channel.id}`;
-            // const userKey = `user${user.id}-${user.nickname}`
-
-            // console.log('before join', socket.rooms);
 
             socket.join(channelKey);
 
@@ -47,8 +44,12 @@ const socketHandler = {
                     // const channelJoined = await Channel.findByPk(channel.id);
                     // channelJoined.addUser(await User.findByPk(user.id));
 
-                } 
+                }
                 await usersStatus.addToOnlineList(channelKey, user.id);
+
+                await usersStatus.addSocketToList(channelKey, socket.id, user.id)
+
+                console.log('sockets on join', await usersStatus.getSocketsByChannel(channelKey))
             }
 
             catch (err) {
@@ -80,29 +81,46 @@ const socketHandler = {
     },
 
     disconnecting: (socket, io) => {
-        socket.on('disconnecting', async ({ channel, user }) => {
-            // console.log('on disconnecting', socket.rooms)
-            // const userKey = `user${user.id}-${user.nickname}`
+        socket.on('disconnecting', async () => {
+            try {
+                console.log(socket.rooms)
+                const channelKey = [...socket.rooms][1];
+                const socketsList = await usersStatus.checkSockets(channelKey, socket.id);
+                const userId = socketsList[1]
 
-            const channelKey = [...socket.rooms][1];
 
-            console.log(socket.rooms)
-            console.log(socket.id)
+                if (socketsList.length <= 2) {
+                    await usersStatus.removeFromOnlineList(channelKey, userId);
 
-            await usersStatus.removeFromOnlineList(channelKey, '1')
+                    // key 'user-leave' to tell front to shift user from online user list to offline user list
+                    io.to(channelKey).emit('user-leave', {
+                        channel: {
+                            id: parseInt(channelKey.slice(8))
+                        },
+                        user: {
+                            id: parseInt(userId)
+                        }
+                    });
 
-            // key 'user-leave' to tell front to shift user from online user list to offline user list
-            // io.to(channelKey).emit('user-leave', { channel, user });
+                    console.log({
+                        channel: {
+                            id: parseInt(channelKey.slice(8))
+                        },
+                        user: {
+                            id: parseInt(userId)
+                        }
+                    })
 
-            // try {
-            //     await usersStatus.switchUserStatus(channelKey, userKey, 'offline');
+                    console.log("user disconnect");
+                }
 
-                console.log("user disconnect");
-            // }
+                await usersStatus.removeSocketFromList(channelKey, socket.id)
+                console.log(socket.rooms)
+            }
 
-            // catch (err) {
-            //     console.error(err);
-            // }
+            catch (err) {
+                console.error(err);
+            }
 
         })
     }
