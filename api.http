@@ -17,6 +17,11 @@ GET http://localhost:8000/v1/user/1000
 
 #------------------------------------------------
 
+### GET /v1/tags/channels (success)
+GET http://localhost:8000/v1/tags/channels
+
+#------------------------------------------------
+
 ### GET /v1/tags (success)
 GET http://localhost:8000/v1/tags
 
