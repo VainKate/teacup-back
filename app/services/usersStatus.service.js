@@ -39,18 +39,6 @@ const usersStatus = {
         await asyncClient.zrem(`${PREFIX + channelKey}-sockets`, socket)
     },
 
-    getSocketsByChannel: async (channelKey) => {
-        const sockets = await asyncClient.zrange(`${PREFIX + channelKey}-sockets`, 0, -1)
-
-        return sockets
-    },
-
-    getUserIdFromSocket : async (channelKey, socket) => {
-        const userId = await asyncClient.zscore(`${PREFIX + channelKey}-sockets`, socket)
-
-        return userId
-    },
-
     checkSockets : async (channelKey, socket) => {
         const userId = await asyncClient.zscore(`${PREFIX + channelKey}-sockets`, socket)
 
