@@ -10,6 +10,7 @@ const asyncClient = {
     srem: promisify(client.srem).bind(client),
     smembers: promisify(client.smembers).bind(client),
     zadd: promisify(client.zadd).bind(client),
+    zcount: promisify(client.zcount).bind(client),
     zrem: promisify(client.zrem).bind(client),
     zrange: promisify(client.zrange).bind(client),
     zscore: promisify(client.zscore).bind(client),
@@ -33,6 +34,8 @@ const usersStatus = {
 
     addSocketToList: async (channelKey, socket, userId) => {
         await asyncClient.zadd(`${PREFIX + channelKey}-sockets`, userId, socket);
+
+        return await asyncClient.zcount(`${PREFIX + channelKey}-sockets`, userId, userId);
     },
 
     removeSocketFromList : async (channelKey, socket) => {

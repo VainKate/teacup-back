@@ -31,21 +31,25 @@ const socketHandler = {
             try {
                 socket.join(channelKey);
 
-                const channel = await Channel.findByPk(channel.id);
-                await channel.addUser(user.id);
+                const currentChannel = await Channel.findByPk(channel.id);
+                await currentChannel.addUser(user.id);
 
                 await usersStatus.addToOnlineList(channelKey, user.id);
 
-                await usersStatus.addSocketToList(channelKey, socket.id, user.id)
+                const socketsCount = await usersStatus.addSocketToList(channelKey, socket.id, user.id)
 
                 // send confirmation to front that user had join the channel
                 socket.emit('confirm');
 
-                // key 'user-join' to tell front to add user to online user list
-                io.to(channelKey).emit('user:join', { channel, user });
+                // If user did not already had an active socket for this room, we can tell front to add him to online user list
+                if (socketsCount === 1) {
+                    // key 'user-join' to tell front to add user to online user list
+                    io.to(channelKey).emit('user:join', { channel, user });
+                }
 
             } catch (err) {
-                socket.emit('error');
+                socket.emit('error', err);
+                console.error(err)
             }
         })
     },
@@ -83,7 +87,7 @@ const socketHandler = {
                 const socketsList = await usersStatus.checkSockets(channelKey, socket.id);
                 const userId = socketsList[1]
 
-
+                // if this socket was the last one of the user for this room, we can tell front to shift user from online list to offline
                 if (socketsList.length <= 2) {
                     await usersStatus.removeFromOnlineList(channelKey, userId);
 
@@ -102,7 +106,8 @@ const socketHandler = {
                 await usersStatus.removeSocketFromList(channelKey, socket.id)
 
             } catch (err) {
-                socket.emit('error');
+                socket.emit('error', err);
+                console.error(err)
             }
 
         })
