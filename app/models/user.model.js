@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes, Model) => {
             type: DataTypes.TEXT,
             allowNull: false
         },
+
         email: {
             type: DataTypes.TEXT,
             unique: true,
@@ -18,10 +19,13 @@ module.exports = (sequelize, DataTypes, Model) => {
                 }
             }
         },
+
         password: {
             type: DataTypes.TEXT,
             allowNull: false
-        }
+        },
+
+        recommendedChannels : DataTypes.VIRTUAL
     }, {
         sequelize,
         modelName: 'User',
