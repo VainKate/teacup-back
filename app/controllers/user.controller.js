@@ -1,12 +1,28 @@
-const userService = require('../services/user.service');
+const { User, Channel, Tag } = require("../models");
 
 const userController = {
-    update(req, res, next) {
-        userService
-            .update(req.params.id, req.body)
-            .then((user) => res.json(user))
-            .catch(next);
+    /**
+     *
+     * @param {json} req.body
+     * @param {json} res.json
+     * @returns
+     */
+
+    update: async (req, res, next) => {
+        const id = parseInt(req.params.id);
+
+        try {
+            const result = await User.update(req.body, {where: {id}});
+            if (result[0] >= 1) {
+                res.json(result);
+            } else {
+                next();
+            }
+        } catch(error) {
+            console.error(error);
+            res.status(500).json({error: error.message});
+        }
     },
-};
+}
 
 module.exports = userController;
