@@ -110,37 +110,28 @@ const authController = {
                 },
             });
 
-            const userWithRecommendations = [{ user }, { recommendedChannels }];
-
             //! figure out how to generate_refresh_token
             const refreshToken = generate_refresh_token(64);
             const refreshTokenMaxAge = new Date() + jwtRefreshExpiration; // today's date + one month in seconds
 
             // Generate a new access token
-            const token = jwt.sign({ uid: user.id }, jwtSecret, {
+            const token = jwt.sign({ id: user.id }, jwtSecret, {
                 expiresIn: jwtExpiration
             });
 
-            /*
-            According to youtube tutorial :
-            req.session.user = {nickname : user.nickname, id : user.id, email : user.email} --? or-- user
-
-            OR
-
-            According to guidearea turotial :
             res.cookie("access_token", token, {
                 // secure: true,
                 httpOnly: true
             });
-            res.cookie("refresh_token", refresh_token, {
+
+            res.cookie("refresh_token", refreshToken, {
                 // secure: true,
                 httpOnly: true
             });
-            */
 
+            client
 
-            // res.json(userWithRecommendations)
-            res.json({auth : true, token, userWithRecommendations}) 
+            res.json({ auth: true, token, user })
 
         } catch (error) {
             return res.status(400).send(error.message);
