@@ -9,7 +9,7 @@ const refreshTokenService = require('../services/refreshToken.service');
 // node -e "console.log(require('crypto').randomBytes(256).toString('base64'));"
 const jwtSecret = process.env.JWT_SECRET;
 const jwtExpiration = 60 * 5; // By security measures, we set jwtExpiration to a short time, 5 minutes here.
-const jwtRefreshExpiration = 60 * 60 * 24 * 30; // duration of the refresh token, 30 days here
+const jwtRefreshExpiration = 60 * 60 * 24 * 30; // duration of the refresh token, 30 days here.
 
 const authController = {
     /**
