@@ -1,20 +1,6 @@
-const client = require('../redisClient');
+const asyncClient = require('../redisClient');
 
 const PREFIX = 'teacup:'
-
-const { promisify } = require('util');
-
-const asyncClient = {
-    sadd: promisify(client.sadd).bind(client),
-    srem: promisify(client.srem).bind(client),
-    smembers: promisify(client.smembers).bind(client),
-    zadd: promisify(client.zadd).bind(client),
-    zcount: promisify(client.zcount).bind(client),
-    zrem: promisify(client.zrem).bind(client),
-    zrange: promisify(client.zrange).bind(client),
-    zscore: promisify(client.zscore).bind(client),
-    zrangebyscore: promisify(client.zrangebyscore).bind(client),
-};
 
 const usersStatus = {
     addToOnlineList: async (channelKey, userId) => {
