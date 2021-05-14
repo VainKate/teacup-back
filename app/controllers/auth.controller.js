@@ -107,7 +107,7 @@ const authController = {
 
             user.recommendedChannels = recommendedChannels;
 
-            const { token, refreshToken } = await authService.generateTokens({ id: user.id });
+            const { token, refreshToken } = await authService.generateTokens({id : user.id});
 
             res.cookie("access_token", token, {
                 httpOnly: true

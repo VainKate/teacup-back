@@ -8,8 +8,8 @@ const verifyJWT = async (req, res, next) => {
     // console.log(req);
     // console.log(req.headers.cookie)
 
-    const accessToken = req.cookies?.access_token || null;
-    const refreshToken = req.cookies?.refresh_token || null;
+    const currentAccessToken = req.cookies.access_token || null;
+    const currentRefreshToken = req.cookies.refresh_token || null;
 
     // console.log(req.headers.cookie)
     // console.log(req.headers.cookie.access_token)
@@ -17,7 +17,7 @@ const verifyJWT = async (req, res, next) => {
     // const accessToken = req.headers.cookie?.access_token || null;
     // const refreshToken = req.headers.cookie?.refresh_token || null;
 
-    if (!accessToken && !refreshToken) {
+    if (!currentAccessToken && !currentRefreshToken) {
         console.log('pas de token')
         return res.status(401).send('No token found');
     }
@@ -32,39 +32,43 @@ const verifyJWT = async (req, res, next) => {
     //     return res.status(401).send('Invalid Token');
     // }
     try {
-        jwt.verify(accessToken, jwtSecret, async (err, decoded) => {
-            if (!err) {
-                console.log('access decoded ok')
+        jwt.verify(currentAccessToken, jwtSecret, async (err, decoded) => {
+            if (!err) { // Scenario ok
+                console.log('ok with access token')
                 req.userId = decoded.id;
                 return next();
             };
 
             if (err && err.name !== 'TokenExpiredError') {
                 console.log('token invalid')
-                return res.send('Invalid token')
+                return next('Invalid token')
             };
 
-            const decodedRefreshToken = jwt.verify(refreshToken, jwtSecret);
+            const decodedRefreshToken = jwt.verify(currentRefreshToken, jwtSecret);
 
             if (!decodedRefreshToken) {
                 console.log('pas de decoded refresh token')
                 return next('expired refresh token')
             }
 
-            console.log(decodedRefreshToken)
-
             const redisToken = await authService.getRefreshToken(decodedRefreshToken.id) || null;
 
-            if (!redisToken || redisToken.refreshToken !== refreshToken) {
+            if (!redisToken || JSON.parse(redisToken).refreshToken !== currentRefreshToken) {
                 console.log('redis token invalid')
-                return res.send('Well nope ?') // probable hacker
+                console.log('redistoken :', redisToken)
+                console.log('redisToken.refreshToken', JSON.parse(redisToken).refreshToken)
+                console.log('refreshToken', currentRefreshToken)
+                return next('Well nope ?') // probable hacker
                 // throw new Error('Invalid redis token')
             };
 
-            const { token, newRefreshToken } = await authService.generateTokens(decodedRefreshToken.id);
+            const {token, refreshToken} = await authService.generateTokens({ id: decodedRefreshToken.id });
+
+            console.log('token', token)
+            console.log('refresh', refreshToken)
 
             // ? "__refresh_token" in the tutorial error ?
-            res.cookie("refresh_token", newRefreshToken, {
+            res.cookie("refresh_token", refreshToken, {
                 httpOnly: true
             });
 
@@ -73,9 +77,9 @@ const verifyJWT = async (req, res, next) => {
                 httpOnly: true
             });
 
-            await authService.saveRefreshToken(decoded.id, newRefreshToken);
+            await authService.saveRefreshToken(decodedRefreshToken.id, refreshToken);
 
-            req.userId = decoded.id;
+            req.userId = decodedRefreshToken.id;
             next();
         })
     }

@@ -46,9 +46,10 @@ Content-Type: application/json
 ### GET /v1/channel/:id (success) => Auth test !
 GET http://localhost:8000/v1/channel/1
 Content-Type: application/json
-Set-Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjo1MX0sImlhdCI6MTYyMDk5Mzc2NiwiZXhwIjoxNjIwOTk0MDY2fQ.E-AxMF3ntszjTw532ncjn3TBpsrnuynKnWL1HQAbP48; Path=/; HttpOnly,refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjo1MX0sImlhdCI6MTYyMDk5Mzc2NiwiZXhwIjoxNjIzNTg1NzY2fQ.Pqc3v8IZYg9DfH67HhPISaIRzh0teUR-ZDU5h8nvgVs; Path=/; HttpOnly
+# works with access token + timeout ok
+# works with refresh token
 
-# works with access token
+# X time out of refresh token
 
 #------------------------------------------------
 
