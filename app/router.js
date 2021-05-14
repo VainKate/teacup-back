@@ -8,9 +8,11 @@ const { authController, channelController, tagController, userController } = req
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 
+router.get('/channels', channelController.getAllChannels);
 router.get('/channel/:id(\\d+)', channelController.getChannelById);
 
 router.get('/tags', tagController.getAllTags);
+router.get('/tags/channels', tagController.getAllTagsWithChannels);
 
 // [put] route for update user
 router.put('/users/:id', userController.update);
