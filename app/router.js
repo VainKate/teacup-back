@@ -15,5 +15,9 @@ router.get('/channel/:id(\\d+)', verifyJWT, channelController.getChannelById);
 
 router.get('/tags', tagController.getAllTags);
 
+router.use((error, req, res, next) => {
+    res.send(error);
+})
+
 
 module.exports = router;

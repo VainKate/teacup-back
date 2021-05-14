@@ -13,10 +13,10 @@ const PREFIX = "teacup:";
 
 const auth = {
     generateTokens: async (payload) => {
-        const token = jwt.sign(payload, jwtSecret, {
+        const token = jwt.sign({ payload }, jwtSecret, {
             expiresIn: jwtExpiration
         });
-        const refreshToken = jwt.sign(payload, jwtSecret, {
+        const refreshToken = jwt.sign({ payload }, jwtSecret, {
             expiresIn: jwtRefreshExpiration
         });
 
@@ -26,7 +26,7 @@ const auth = {
     saveRefreshToken: async (userId, refreshToken) => {
         await asyncClient.set(`${PREFIX}user${userId}-refreshToken`, JSON.stringify({
             refreshToken,
-            expires : refreshTokenMaxAge
+            expires: refreshTokenMaxAge
         }));
     },
 
