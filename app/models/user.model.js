@@ -21,7 +21,8 @@ module.exports = (sequelize, DataTypes, Model) => {
         password: {
             type: DataTypes.TEXT,
             allowNull: false
-        }
+        },
+        isLogged : DataTypes.VIRTUAL
     }, {
         sequelize,
         modelName: 'User',
