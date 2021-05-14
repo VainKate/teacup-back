@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const { User, Channel } = require("../models");
-const refreshTokenService = require('../services/refreshToken.service');
+const authService = require('../services/auth.service');
 
 // use the command underneath to generate a jwt secret key and then, store it your own .env
 // node -e "console.log(require('crypto').randomBytes(256).toString('base64'));"
@@ -132,7 +132,7 @@ const authController = {
                 httpOnly: true
             });
 
-            await refreshTokenService.saveRefreshToken(user.id, {
+            await authService.saveRefreshToken(user.id, {
                 refreshToken,
                 expires: refreshTokenMaxAge
             });
@@ -146,7 +146,7 @@ const authController = {
 
     logout: async (req, res) => {
         // Can I get user id by the body ?
-        await refreshTokenService.deleteRefreshToken(req.userId)
+        await authService.deleteRefreshToken(req.userId)
 
         res.clearCookie("access_token");
         res.clearCookie("refresh_token");

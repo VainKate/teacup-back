@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
-const refreshTokenService = require('../services/refreshToken.service');
+const authService = require('../services/auth.service');
 
 const jwtSecret = process.env.JWT_SECRET;
 const jwtExpiration = 60 * 5; // By security measures, we set jwtExpiration to a short time, 5 minutes here.
@@ -17,13 +17,23 @@ const verifyJWT = async (req, res, next) => {
         return res.status(401).send('No token found');
     }
 
+    // const { err, decoded } = await jwt.verify(accessToken, jwtSecret);
+    // if (!err) {
+    //     req.userId = decoded.id;
+    //     next();
+    // }
+
+    // if (err.name !== 'TokenExpiredError') {
+    //     return res.status(401).send('Invalid Token');
+    // }
+
     jwt.verify(accessToken, jwtSecret, (err, decoded) => {
         if (err) {
             if (err.name !== 'TokenExpiredError') {
                 return res.send('Invalid token')
             };
 
-            const redisToken = await refreshTokenService.getRefreshToken(decoded.id) || null; // TODO check exactly what's returned by redis in case of no token found
+            const redisToken = await authService.getRefreshToken(decoded.id) || null; // TODO check exactly what's returned by redis in case of no token found
 
             // ? redisToken.refreshToken === refreshToken in the tutorial, error ?
             if (!redisToken || redisToken.refreshToken !== refreshToken) {

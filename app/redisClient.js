@@ -5,7 +5,7 @@ const client = process.env.NODE_ENV === 'production' ?
     redis.createClient()
 
 client.on("connect", () => {
-    console.log("Redis connected.")
+    console.log("Connection to Redis has been established successfully.")
 })
 
 const { promisify } = require('util');
