@@ -1,19 +1,23 @@
-const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const jwtSecret = process.env.JWT_SECRET;
 
 const authService = require('../services/auth.service');
 
-const jwtSecret = process.env.JWT_SECRET;
-const jwtExpiration = 60 * 5; // By security measures, we set jwtExpiration to a short time, 5 minutes here.
-const jwtRefreshExpiration = 60 * 60 * 24 * 30; // duration of the refresh token, 30 days here
-
 const verifyJWT = async (req, res, next) => {
     // const token = req.headers["x-access-token"];
+    // console.log(req);
+    // console.log(req.headers.cookie)
 
-    const accessToken = req.cookies.access_token || null;
-    const refreshToken = req.cookies.refresh_token || null;
+    const accessToken = req.cookies?.access_token || null;
+    const refreshToken = req.cookies?.refresh_token || null;
 
-    if (!accessToken && !refreshToken) {
+    // console.log(req.headers.cookie)
+    // console.log(req.headers.cookie.access_token)
+
+    // const accessToken = req.headers.cookie?.access_token || null;
+    // const refreshToken = req.headers.cookie?.refresh_token || null;
+
+    if (!accessToken && !refreshToken) { // || ou && ?
         return res.status(401).send('No token found');
     }
 
@@ -27,44 +31,40 @@ const verifyJWT = async (req, res, next) => {
     //     return res.status(401).send('Invalid Token');
     // }
 
-    jwt.verify(accessToken, jwtSecret, (err, decoded) => {
-        if (err) {
-            if (err.name !== 'TokenExpiredError') {
-                return res.send('Invalid token')
-            };
-
-            const redisToken = await authService.getRefreshToken(decoded.id) || null; // TODO check exactly what's returned by redis in case of no token found
-
-            // ? redisToken.refreshToken === refreshToken in the tutorial, error ?
-            if (!redisToken || redisToken.refreshToken !== refreshToken) {
-                return res.send('Well nope ?') // probable hacker
-            };
-
-            const newRefreshToken = crypto.randomBytes(64).toString('base64');
-
-            // ? "__refresh_token" in the tutorial error ?
-            res.cookie("refresh_token", newRefreshToken, {
-                // secure: true,
-                httpOnly: true
-            });
-
-            const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
-
-            await asyncClient.saveRefreshToken(decoded.id, {
-                newRefreshToken,
-                expires: refreshTokenMaxAge
-            });
-
-            const token = jwt.sign({ id: decoded.id }, jwtSecret, {
-                expiresIn: jwtExpiration
-            });
-
-            // ? "__access_token" in the tutorial error ?
-            res.cookie("access_token", token, {
-                // secure: true,
-                httpOnly: true
-            });
+    jwt.verify(accessToken, jwtSecret, async (err, decoded) => {
+        if (!err) {
+            req.userId = decoded.id;
+            next();
         };
+
+        if (err && err.name !== 'TokenExpiredError') {
+            return res.send('Invalid token')
+        };
+
+        console.log(decoded);
+
+        const redisToken = await authService.getRefreshToken(decoded.id) || null;
+
+        // TODO check exactly what's returned by redis in case of no token found
+        console.log(!!redisToken);
+
+        if (!redisToken || redisToken.refreshToken !== refreshToken) {
+            return res.send('Well nope ?') // probable hacker
+        };
+
+        const { token, newRefreshToken } = await authService.generateTokens();
+
+        // ? "__refresh_token" in the tutorial error ?
+        res.cookie("refresh_token", newRefreshToken, {
+            httpOnly: true
+        });
+
+        // ? "__access_token" in the tutorial error ?
+        res.cookie("access_token", token, {
+            httpOnly: true
+        });
+
+        await authService.saveRefreshToken(user.id, newRefreshToken);
 
         req.userId = decoded.id;
         next();

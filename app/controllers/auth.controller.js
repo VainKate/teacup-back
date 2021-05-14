@@ -1,15 +1,8 @@
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 
 const { User, Channel } = require("../models");
 const authService = require('../services/auth.service');
 
-// use the command underneath to generate a jwt secret key and then, store it your own .env
-// node -e "console.log(require('crypto').randomBytes(256).toString('base64'));"
-const jwtSecret = process.env.JWT_SECRET;
-const jwtExpiration = 60 * 5; // By security measures, we set jwtExpiration to a short time, 5 minutes here.
-const jwtRefreshExpiration = 60 * 60 * 24 * 30; // duration of the refresh token, 30 days here.
 
 const authController = {
     /**
@@ -114,30 +107,19 @@ const authController = {
 
             user.recommendedChannels = recommendedChannels;
 
-            const refreshToken = crypto.randomBytes(64).toString('base64');
-            const refreshTokenMaxAge = new Date() + jwtRefreshExpiration; // today's date + one month in seconds
-
-            // Generate a new access token
-            const token = jwt.sign({ id: user.id }, jwtSecret, {
-                expiresIn: jwtExpiration
-            });
+            const { token, refreshToken } = await authService.generateTokens({ id: user.id });
 
             res.cookie("access_token", token, {
-                // secure: true,
                 httpOnly: true
             });
 
             res.cookie("refresh_token", refreshToken, {
-                // secure: true, 
                 httpOnly: true
             });
 
-            await authService.saveRefreshToken(user.id, {
-                refreshToken,
-                expires: refreshTokenMaxAge
-            });
+            await authService.saveRefreshToken(user.id, refreshToken);
 
-            res.json({ user, token })
+            res.json(user)
 
         } catch (error) {
             return res.status(400).send(error.message);
@@ -146,7 +128,7 @@ const authController = {
 
     logout: async (req, res) => {
         // Can I get user id by the body ?
-        await authService.deleteRefreshToken(req.userId)
+        await authService.deleteRefreshToken(req.userId);
 
         res.clearCookie("access_token");
         res.clearCookie("refresh_token");
