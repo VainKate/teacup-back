@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JWT_SECRET;
 
-const ErrorHandler = require('../helpers/error.helper');
 const authService = require('../services/auth.service');
 
 const verifyJWT = async (req, res, next) => {
@@ -10,10 +9,8 @@ const verifyJWT = async (req, res, next) => {
     const currentRefreshToken = req.cookies.refresh_token || null;
 
     if (!currentAccessToken && !currentRefreshToken) {
-        return next(new ErrorHandler(400, 'No token found.'))
+        return res.status(401).send('Invalid token');
     }
-
-    // TODO find where are going errors ? 
 
     try {
         jwt.verify(currentAccessToken, jwtSecret, (err, decoded) => {
@@ -23,18 +20,14 @@ const verifyJWT = async (req, res, next) => {
             };
 
             if (err && err.name !== 'TokenExpiredError') {
-                return next(err);
+                return res.status(401).send('Invalid token');
             };
 
             jwt.verify(currentRefreshToken, jwtSecret, async (err, decodedRefreshToken) => {
-                if (err) {
-                    return next(err);
-                }
+                const redisToken = await authService.getRefreshToken(decodedRefreshToken?.id) || null;
 
-                const redisToken = await authService.getRefreshToken(decodedRefreshToken.id) || null;
-
-                if (!redisToken || JSON.parse(redisToken).refreshToken !== currentRefreshToken) {
-                    return next(new ErrorHandler(400, 'Invalid token.'))
+                if (err || !redisToken || JSON.parse(redisToken).refreshToken !== currentRefreshToken) {
+                    return res.status(401).send('Invalid refresh token');
                 };
 
                 const { token, refreshToken } = await authService.generateTokens({ id: decodedRefreshToken.id });
@@ -56,7 +49,7 @@ const verifyJWT = async (req, res, next) => {
     }
 
     catch (err) {
-        next(err);
+        res.status(400).send(err);
     }
 };
 

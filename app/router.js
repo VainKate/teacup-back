@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const router = Router();
 
-const { authController, channelController, tagController, errorController } = require("./controllers");
+const { authController, channelController, tagController } = require("./controllers");
 const verifyJWT = require('./middlewares/auth.middleware');
 
 
@@ -16,8 +16,6 @@ router.get('/channel/:id(\\d+)', verifyJWT, channelController.getChannelById);
 
 router.get('/tags', tagController.getAllTags);
 router.get('/tags/channels', tagController.getAllTagsWithChannels);
-
-router.use(errorController.handleError);
 
 
 module.exports = router;
