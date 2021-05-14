@@ -17,5 +17,7 @@ router.get('/tags/channels', tagController.getAllTagsWithChannels);
 // [put] route for update user
 router.put('/users/:id', userController.update);
 
+// [delete] route for delete user
+router.delete('/users/:id', userController.delete);
 
 module.exports = router;
