@@ -43,16 +43,6 @@ Content-Type: application/json
 
 #------------------------------------------------
 
-### GET /v1/channel/:id (success) => Auth test !
-GET http://localhost:8000/v1/channel/1
-Content-Type: application/json
-# works with access token + timeout ok
-# works with refresh token
-
-# X time out of refresh token
-
-#------------------------------------------------
-
 ### GET /v1/channel/:id (success)
 GET http://localhost:8000/v1/channel/1
 Content-Type: application/json

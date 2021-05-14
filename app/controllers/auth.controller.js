@@ -89,7 +89,7 @@ const authController = {
                 ? await bcrypt.compare(password, user.password)
                 : false;
 
-            if (!user || !isPasswordValid) {
+            if (!isPasswordValid) {
                 return res.status(409).send(`Your credentials are invalid.`);
             }
 

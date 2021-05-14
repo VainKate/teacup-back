@@ -20,7 +20,7 @@ const asyncClient = {
     zrange: promisify(client.zrange).bind(client),
     zscore: promisify(client.zscore).bind(client),
     zrangebyscore: promisify(client.zrangebyscore).bind(client),
-    set: promisify(client.set).bind(client),
+    setex: promisify(client.setex).bind(client),
     get: promisify(client.get).bind(client),
     del: promisify(client.del).bind(client)
 };

@@ -5,9 +5,11 @@ const asyncClient = require('../redisClient');
 // use the command underneath to generate a jwt secret key and then, store it your own .env
 // node -e "console.log(require('crypto').randomBytes(256).toString('base64'));"
 const jwtSecret = process.env.JWT_SECRET;
-const jwtExpiration = 60 * 5; // By security measures, we set jwtExpiration to a short time, 5 minutes here.
-const jwtRefreshExpiration = 60 * 60 * 24 * 30; // duration of the refresh token, 30 days here
-const refreshTokenMaxAge = new Date() + jwtRefreshExpiration; // today's date + one month in seconds
+const jwtExpiration = process.env.NODE_ENV === 'production' ?
+    60 * 5 : 15;
+const jwtRefreshExpiration = process.env.NODE_ENV === 'production' ?
+    60 * 60 * 24 * 30 : 30
+const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
 const PREFIX = "teacup:";
 
@@ -24,7 +26,7 @@ const auth = {
     },
 
     saveRefreshToken: async (userId, refreshToken) => {
-        await asyncClient.set(`${PREFIX}user${userId}-refreshToken`, JSON.stringify({
+        await asyncClient.setex(`${PREFIX}user${userId}-refreshToken`, jwtRefreshExpiration, JSON.stringify({
             refreshToken,
             expires: refreshTokenMaxAge
         }));
