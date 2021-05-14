@@ -25,7 +25,9 @@ module.exports = (sequelize, DataTypes, Model) => {
             allowNull: false
         },
 
-        recommendedChannels : DataTypes.VIRTUAL
+        recommendedChannels: DataTypes.VIRTUAL,
+
+        isLogged: DataTypes.VIRTUAL
     }, {
         sequelize,
         modelName: 'User',

@@ -32,7 +32,7 @@ app.use('/v1', apiRouter);
 io.on('connection', socket => {
     socketHandler.auth(socket, io);
     socketHandler.message(socket, io);
-    socketHandler.disconnect(socket, io);
+    socketHandler.disconnecting(socket, io);
 })
 
 httpServer.listen(PORT, () => console.log(`Serveur running on http://localhost:${PORT}`));

@@ -11,11 +11,13 @@ router.post("/login", authController.login);
 // router.post('/logout', authController.logout);
 // router.post('/profile', authController.profile);
 
+router.get('/channels', verifyJWT, channelController.getAllChannels);
 router.get('/channel/:id(\\d+)', verifyJWT, channelController.getChannelById);
 
 router.get('/tags', tagController.getAllTags);
+router.get('/tags/channels', tagController.getAllTagsWithChannels);
 
-router.use((error, req, res, next) => {
+router.use((error, _, res) => {
     res.send(error);
 })
 
