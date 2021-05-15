@@ -85,9 +85,9 @@ const authController = {
                 },
             });
 
-            const isPasswordValid = user
-                ? await bcrypt.compare(password, user.password)
-                : false;
+            const isPasswordValid = user ?
+                await bcrypt.compare(password, user.password) :
+                false;
 
             if (!isPasswordValid) {
                 return res.status(409).send(`Your credentials are invalid.`);
@@ -107,7 +107,7 @@ const authController = {
 
             user.recommendedChannels = recommendedChannels;
 
-            const { token, refreshToken } = await authService.generateTokens({id : user.id});
+            const { token, refreshToken } = await authService.generateTokens({ id: user.id });
 
             res.cookie("access_token", token, {
                 httpOnly: true
@@ -116,8 +116,6 @@ const authController = {
             res.cookie("refresh_token", refreshToken, {
                 httpOnly: true
             });
-
-            await authService.saveRefreshToken(user.id, refreshToken);
 
             res.json(user)
 
@@ -133,7 +131,7 @@ const authController = {
         res.clearCookie("access_token");
         res.clearCookie("refresh_token");
 
-        res.redirect('/');
+        res.status(200).send('Logout succed');
     }
 };
 

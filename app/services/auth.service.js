@@ -22,18 +22,28 @@ const auth = {
             expiresIn: jwtRefreshExpiration
         });
 
+        await auth.saveRefreshToken(payload.id, refreshToken);
+
         return { token, refreshToken }
     },
 
     saveRefreshToken: async (userId, refreshToken) => {
-        await asyncClient.setex(`${PREFIX}user${userId}-refreshToken`, jwtRefreshExpiration, JSON.stringify({
-            refreshToken,
-            expires: refreshTokenMaxAge
-        }));
+        await asyncClient.setex(`${PREFIX}user${userId}-refreshToken`,
+            jwtRefreshExpiration,
+            JSON.stringify({
+                refreshToken,
+                expires: refreshTokenMaxAge
+            }));
     },
 
     getRefreshToken: async (userId) => {
-        return await asyncClient.get(`${PREFIX}user${userId}-refreshToken`)
+        const refreshToken = await asyncClient.get(`${PREFIX}user${userId}-refreshToken`);
+
+        if (!refreshToken) {
+            throw new Error("refresh token is invalid or expired")
+        };
+
+        return JSON.parse(refreshToken)
     },
 
     deleteRefreshToken: async (userId) => {

@@ -5,52 +5,50 @@ const authService = require('../services/auth.service');
 
 const verifyJWT = async (req, res, next) => {
 
-    const currentAccessToken = req.cookies.access_token || null;
-    const currentRefreshToken = req.cookies.refresh_token || null;
+    const accessToken = req.cookies.access_token || null;
+    const refreshToken = req.cookies.refresh_token || null;
 
-    if (!currentAccessToken && !currentRefreshToken) {
+    if (!accessToken && !refreshToken) {
         return res.status(401).send('Invalid token');
     }
 
-    try {
-        jwt.verify(currentAccessToken, jwtSecret, (err, decoded) => {
-            if (!err) { 
-                req.userId = decoded.id;
-                return next();
+    jwt.verify(accessToken, jwtSecret, async (err, decodedAccessToken) => {
+        if (!err && decodedAccessToken) {
+            res.userId = decodedAccessToken.id
+            return next()
+        };
+
+        if (err.name !== 'TokenExpiredError') {
+            return next(err);
+        };
+
+        try {
+            const decoded = jwt.verify(refreshToken, jwtSecret)
+
+            const { refreshToken: redisToken } = await authService.getRefreshToken(refreshToken);
+
+            if (redisToken !== refreshToken) {
+                next(new Error("refresh token is invalid or expired"))
             };
 
-            if (err && err.name !== 'TokenExpiredError') {
-                return res.status(401).send('Invalid token');
-            };
+            const { token, refreshToken : newRefreshToken } = await authService.generateTokens({ id: decoded.id });
 
-            jwt.verify(currentRefreshToken, jwtSecret, async (err, decodedRefreshToken) => {
-                const redisToken = await authService.getRefreshToken(decodedRefreshToken?.id) || null;
+            res.cookie("access_token", token, {
+                httpOnly: true
+            });
 
-                if (err || !redisToken || JSON.parse(redisToken).refreshToken !== currentRefreshToken) {
-                    return res.status(401).send('Invalid refresh token');
-                };
+            res.cookie("refresh_token", newRefreshToken, {
+                httpOnly: true
+            });
 
-                const { token, refreshToken } = await authService.generateTokens({ id: decodedRefreshToken.id });
+            req.userId = decoded.id;
+            next();
+        }
 
-                res.cookie("access_token", token, {
-                    httpOnly: true
-                });
-
-                res.cookie("refresh_token", refreshToken, {
-                    httpOnly: true
-                });
-
-                await authService.saveRefreshToken(decodedRefreshToken.id, refreshToken);
-
-                req.userId = decodedRefreshToken.id;
-                next();
-            })
-        })
-    }
-
-    catch (err) {
-        res.status(400).send(err);
-    }
+        catch (err) {
+            next(err)
+        }
+    });
 };
 
 module.exports = verifyJWT;

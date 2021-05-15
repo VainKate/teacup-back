@@ -47,9 +47,6 @@ Content-Type: application/json
 GET http://localhost:8000/v1/channel/1
 Content-Type: application/json
 
-### GET /v1/channel/:id (auth failed)
-GET http://localhost:8000/v1/channel/1
-
 ### GET /v1/channel/:id (404)
 GET http://localhost:8000/v1/channel/1000
 
