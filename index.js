@@ -20,7 +20,7 @@ const io = new Server(httpServer, {
     }
 });
 
-const apiRouter = require('./app/router');
+const apiRouter = require('./app/routes/router');
 const socketHandler = require('./app/services/socket.handler');
 
 const PORT = process.env.PORT || 8000;

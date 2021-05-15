@@ -1,7 +1,10 @@
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
 
 const { User, Channel } = require("../models");
 const authService = require('../services/auth.service');
+
+const jwtSecret = process.env.JWT_SECRET
 
 
 const authController = {
@@ -117,21 +120,28 @@ const authController = {
                 httpOnly: true
             });
 
-            res.json(user)
+            res.status(200).json(user)
 
         } catch (error) {
-            return res.status(400).send(error.message);
+            return res.status(500).send(error.message);
         }
     },
 
     logout: async (req, res) => {
-        // Can I get user id by the body ?
-        await authService.deleteRefreshToken(req.userId);
+        if (!req.cookies.access_token && !req.cookies.refresh_token) {
+            return res.status(401).send('User is already logout')
+        }
+
+        const decoded = jwt.verify(req.cookies.access_token, jwtSecret, {
+            ignoreExpiration: true
+        })
+
+        await authService.deleteRefreshToken(decoded.id);
 
         res.clearCookie("access_token");
         res.clearCookie("refresh_token");
 
-        res.status(200).send('Logout succed');
+        res.status(200).send('Logout succeed');
     }
 };
 
