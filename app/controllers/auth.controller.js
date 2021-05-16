@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const { User, Channel } = require("../models");
 const authService = require('../services/auth.service');
 
-const jwtSecret = process.env.JWT_SECRET
+const SALT_ROUNDS = 10;
+const JWT_SECRET = process.env.JWT_SECRET
 
 
 const authController = {
@@ -40,8 +41,7 @@ const authController = {
                     );
             }
 
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
             const newUser = await User.create({
                 email,
@@ -132,7 +132,7 @@ const authController = {
             return res.status(401).send('User is already logout')
         }
 
-        const decoded = jwt.verify(req.cookies.access_token, jwtSecret, {
+        const decoded = jwt.verify(req.cookies.access_token, JWT_SECRET, {
             ignoreExpiration: true
         })
 

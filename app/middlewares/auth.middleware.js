@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
-const jwtSecret = process.env.JWT_SECRET;
 
 const authService = require('../services/auth.service');
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const verifyJWT = async (req, res, next) => {
 
@@ -13,7 +14,7 @@ const verifyJWT = async (req, res, next) => {
             throw new Error('No token found');
         }
 
-        await jwt.verify(accessToken, jwtSecret, async (err, decodedAccessToken) => {
+        await jwt.verify(accessToken, JWT_SECRET, async (err, decodedAccessToken) => {
             if (!err && decodedAccessToken) {
                 res.userId = decodedAccessToken.id
                 return next()
@@ -24,7 +25,7 @@ const verifyJWT = async (req, res, next) => {
             };
 
 
-            const decoded = jwt.verify(refreshToken, jwtSecret)
+            const decoded = jwt.verify(refreshToken, JWT_SECRET)
 
             const { refreshToken: redisToken } = await authService.getRefreshToken(decoded.id);
 

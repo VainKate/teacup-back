@@ -1,5 +1,4 @@
 const { sequelize, Channel, Tag, User } = require('../app/models');
-const { Op } = require('sequelize')
 const bcrypt = require('bcrypt');
 const faker = require('faker')
 

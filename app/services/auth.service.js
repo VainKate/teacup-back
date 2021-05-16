@@ -2,23 +2,24 @@ const jwt = require('jsonwebtoken');
 
 const asyncClient = require('../redisClient');
 
+
+const PREFIX = "teacup:";
 // use the command underneath to generate a jwt secret key and then, store it your own .env
 // node -e "console.log(require('crypto').randomBytes(256).toString('base64'));"
-const jwtSecret = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET;
+
 const jwtExpiration = process.env.NODE_ENV === 'production' ?
     60 * 5 : 15;
 const jwtRefreshExpiration = process.env.NODE_ENV === 'production' ?
     60 * 60 * 24 * 30 : 30
 const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
-const PREFIX = "teacup:";
-
 const auth = {
     generateTokens: async (payload) => {
-        const token = jwt.sign(payload, jwtSecret, {
+        const token = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration
         });
-        const refreshToken = jwt.sign(payload, jwtSecret, {
+        const refreshToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtRefreshExpiration
         });
 
