@@ -1,4 +1,4 @@
-const { User, Channel, Tag } = require("../models");
+const { User } = require("../models");
 
 const userController = {
     /**
@@ -15,13 +15,13 @@ const userController = {
         try {
             const options = tags
                 ? {
-                      include: {
-                          association: "tags",
-                          through: {
-                              attributes: [],
-                          },
-                      },
-                  }
+                    include: {
+                        association: "tags",
+                        through: {
+                            attributes: [],
+                        },
+                    },
+                }
                 : null;
 
             const user = await User.findByPk(id, options);
@@ -38,25 +38,31 @@ const userController = {
 
             await user.reload();
 
-            res.json(user);
+            res.status(200).json(user);
+
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json(error.parent.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
         }
     },
 
-    // delete must only be used if the id exists !
     delete: async (req, res) => {
         // store id in a const with incoming request parameters id
         const id = parseInt(req.params.id);
         try {
-            const user = await User.findByPk(id);
             // delete the user
-            await user.destroy({ where: { id } });
+            const deleted = await User.destroy({ where: { id } });
+
+            if (deleted === 0) {
+                return res.status(404).json({ message: 'This user does not exist or is already deleted' })
+            }
+
             // send a 200 status and a message to show that user has been deleted
-            res.status(200).send(`User ${user.nickname} has benn suppressed`);
+            res.status(200).send(`User account successfully deleted`);
+
         } catch (error) {
-            console.error(error);
-            response.status(500).json({ error: error.message });
+            res.status(500).json({ error: error.message });
         }
     },
 };
