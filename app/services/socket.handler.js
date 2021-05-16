@@ -1,4 +1,5 @@
 const { Channel, User } = require('../models');
+const usersStatus = require('./usersStatus.service');
 
 const socketHandler = {
     auth: (socket, io) => {
@@ -8,31 +9,48 @@ const socketHandler = {
                 user : {
                     id : number,
                     nickname : string
-                    -- prévoir un boolean alreadyJoined
-                }
+                },
                 channel : {
                     id : number
-                }
+                },
+                onlineUsers : [
+                    {
+                    id : number,
+                    nickname : string
+                },
+                {
+                    id : number,
+                    nickname : string
+                },
+                etc
+                ]
             }
             */
+            const channelKey = `channel-${channel.id}`;
 
-            socket.join(`channel-${channel.id}`);
-            socket.emit('confirm');
+            try {
+                socket.join(channelKey);
 
-            // key 'user-join' to tell front to add user to user list
-            io.to(`channel-${channel.id}`).emit('user-join', { channel, user });
+                const currentChannel = await Channel.findByPk(channel.id);
+                await currentChannel.addUser(user.id);
 
-            // try {
-            //     if (!user.alreadyJoined) {
-            //         const channelJoined = await Channel.findByPk(channel.id);
-            //         channelJoined.addUser(await User.findByPk(user.id));
-            //     }
-            // }
+                await usersStatus.addToOnlineList(channelKey, user.id);
 
-            // catch (err) {
-            //     console.error(err);
-            // }
+                const socketsCount = await usersStatus.addSocketToList(channelKey, socket.id, user.id)
 
+                // send confirmation to front that user had join the channel
+                socket.emit('confirm');
+
+                // If user did not already had an active socket for this room, we can tell front to add him to online user list
+                if (socketsCount === 1) {
+                    // key 'user-join' to tell front to add user to online user list
+                    io.to(channelKey).emit('user:join', { channel, user });
+                }
+
+            } catch (err) {
+                socket.emit('error', err);
+                console.error(err)
+            }
         })
     },
 
@@ -57,13 +75,41 @@ const socketHandler = {
         })
     },
 
-    disconnect: (socket, io) => {
-        socket.on('disconnect', ({ channel, user }) => {
+    disconnecting: (socket, io) => {
+        socket.on('disconnecting', async () => {
+            try {
+                const channelKey = [...socket.rooms][1] || null;
 
-            // key 'user-leave' to tell front to shift user from online user list to offline user list
-            // io.to(`channel-${channel.id}`).emit('user-leave', { channel, user });
+                if (!channelKey) {
+                    return;
+                }
 
-            console.log("user disconnect")
+                const socketsList = await usersStatus.checkSockets(channelKey, socket.id);
+                const userId = socketsList[1]
+
+                // if this socket was the last one of the user for this room, we can tell front to shift user from online list to offline
+                if (socketsList.length <= 2) {
+                    await usersStatus.removeFromOnlineList(channelKey, userId);
+
+                    // key 'user-leave' to tell front to shift user from online user list to offline user list
+                    io.to(channelKey).emit('user:leave', {
+                        channel: {
+                            id: parseInt(channelKey.slice(8))
+                        },
+                        user: {
+                            id: parseInt(userId)
+                        }
+                    });
+
+                }
+
+                await usersStatus.removeSocketFromList(channelKey, socket.id)
+
+            } catch (err) {
+                socket.emit('error', err);
+                console.error(err)
+            }
+
         })
     }
 };
