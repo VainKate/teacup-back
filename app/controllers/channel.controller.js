@@ -1,12 +1,15 @@
 const { Channel } = require("../models");
+const usersStatus = require('../services/usersStatus.service');
 
 const channelController = {
     getChannelById: async (req, res) => {
         try {
+            const onlineList = await usersStatus.getOnlineList(`channel-${req.params.id}`);
+
             const channel = await Channel.findByPk(req.params.id, {
                 include: {
                     association: 'users',
-                    attributes: ['id', 'nickname'],
+                    attributes: ['id', 'nickname','isLogged'],
                     through: {
                         attributes: []
                     }
@@ -16,6 +19,10 @@ const channelController = {
             if (!channel) {
                 return res.status(404).send('Channel not found')
             };
+
+            for (const user of channel.users){
+                user.isLogged = onlineList.includes(user.id.toString()) ? true : false;
+            }
 
             return res.json(channel);
         }
