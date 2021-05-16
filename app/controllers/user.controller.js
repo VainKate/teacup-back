@@ -62,7 +62,9 @@ const userController = {
             res.status(200).send(`User account successfully deleted`);
 
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json(error.parent.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
         }
     },
 };
