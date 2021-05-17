@@ -1,0 +1,55 @@
+#------------------------------------------------
+
+### PUT /v1/user/:id (success) update all
+PUT http://localhost:8000/v1/users/51
+Content-Type: application/json
+
+{
+    "email" : "supahaka@testmail.com",
+    "nickname" : "SUPAHAKA",
+    "tags" : [1, 10, 11, 12, 14, 18, 19]
+
+}
+
+### PUT /v1/user/:id (success) update just tags
+PUT http://localhost:8000/v1/users/51
+Content-Type: application/json
+
+{
+    "tags" : [1, 10, 11, 14, 18]
+
+}
+
+### PUT /v1/user/:id (success) update just email
+PUT http://localhost:8000/v1/users/51
+Content-Type: application/json
+
+{
+    "email" : "supahaka@testmail.com"
+}
+
+### PUT /v1/user/:id (email already exist) 
+PUT http://localhost:8000/v1/users/1
+Content-Type: application/json
+
+{
+    "email" : "supahaka@testmail.com"
+}
+
+### PUT /v1/user/:id (user account does not exist) 
+PUT http://localhost:8000/v1/users/52
+Content-Type: application/json
+
+{
+    "email" : "supahakaTHETHIRD@testmail.com"
+}
+
+#------------------------------------------------
+
+### DELETE /v1/user/:id (success)
+DELETE http://localhost:8000/v1/users/47
+Content-Type: application/json
+
+### DELETE /v1/user/:id (deletion of inexistant user)
+DELETE http://localhost:8000/v1/users/53
+Content-Type: application/json
