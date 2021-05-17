@@ -16,7 +16,7 @@ const verifyJWT = async (req, res, next) => {
 
         await jwt.verify(accessToken, JWT_SECRET, async (err, decodedAccessToken) => {
             if (!err && decodedAccessToken) {
-                res.userId = decodedAccessToken.id
+                req.userId = decodedAccessToken.id
                 return next()
             };
 

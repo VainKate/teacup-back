@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const jwtExpiration = process.env.NODE_ENV === 'production' ?
     60 * 5 : 15;
 const jwtRefreshExpiration = process.env.NODE_ENV === 'production' ?
-    60 * 60 * 24 * 30 : 30
+    60 * 60 * 24 * 30 : 30;
 const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
 const auth = {
