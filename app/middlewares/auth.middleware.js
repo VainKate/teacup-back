@@ -27,15 +27,15 @@ const verifyJWT = async (req, res, next) => {
 
             const decoded = jwt.verify(refreshToken, JWT_SECRET)
 
-            const { refreshToken: redisToken } = await authService.getRefreshToken(decoded.id);
+            const { refreshToken: redisToken } = await authService.getRefreshToken(decoded.id, accessToken);
 
             if (redisToken !== refreshToken) {
                 throw new Error("refresh token is invalid or expired");
             };
 
-            const { token, refreshToken: newRefreshToken } = await authService.generateTokens({ id: decoded.id });
+            const { accessToken : newAccessToken, refreshToken: newRefreshToken } = await authService.generateTokens({ id: decoded.id });
 
-            res.cookie("access_token", token, {
+            res.cookie("access_token", newAccessToken, {
                 httpOnly: true
             });
 

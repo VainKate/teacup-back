@@ -110,9 +110,9 @@ const authController = {
 
             user.recommendedChannels = recommendedChannels;
 
-            const { token, refreshToken } = await authService.generateTokens({ id: user.id });
+            const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
-            res.cookie("access_token", token, {
+            res.cookie("access_token", accessToken, {
                 httpOnly: true
             });
 
@@ -123,25 +123,37 @@ const authController = {
             res.status(200).json(user)
 
         } catch (error) {
-            return res.status(500).send(error.message);
+            res.status(500).json(error.parent?.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
         }
     },
 
     logout: async (req, res) => {
-        if (!req.cookies.access_token && !req.cookies.refresh_token) {
-            return res.status(401).send('User is already logout')
+        try {
+            if (!req.cookies.access_token || !req.cookies.refresh_token) {
+                return res.status(401).send('User is already logout')
+            }
+
+            const decoded = jwt.verify(req.cookies.access_token, JWT_SECRET, {
+                ignoreExpiration: true
+            })
+
+            await authService.deleteRefreshToken(decoded.id, req.cookies.access_token);
+
+            res.clearCookie("access_token");
+            res.clearCookie("refresh_token");
+
+            res.status(200).send('Logout succeed');
+
+        } catch (error) {
+            res.status(401).json(err.name !== 'Error' ?
+            err :
+            {
+                "message": err.message
+            })
         }
 
-        const decoded = jwt.verify(req.cookies.access_token, JWT_SECRET, {
-            ignoreExpiration: true
-        })
-
-        await authService.deleteRefreshToken(decoded.id);
-
-        res.clearCookie("access_token");
-        res.clearCookie("refresh_token");
-
-        res.status(200).send('Logout succeed');
     }
 };
 

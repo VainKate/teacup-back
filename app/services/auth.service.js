@@ -16,20 +16,20 @@ const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
 const auth = {
     generateTokens: async (payload) => {
-        const token = jwt.sign(payload, JWT_SECRET, {
+        const accessToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration
         });
         const refreshToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtRefreshExpiration
         });
 
-        await auth.saveRefreshToken(payload.id, refreshToken);
+        await auth.saveRefreshToken(payload.id, accessToken, refreshToken);
 
-        return { token, refreshToken }
+        return { accessToken, refreshToken }
     },
 
-    saveRefreshToken: async (userId, refreshToken) => {
-        await asyncClient.setex(`${PREFIX}user${userId}-refreshToken`,
+    saveRefreshToken: async (userId, accessToken, refreshToken) => {
+        await asyncClient.setex(`${PREFIX}user${userId}-${accessToken}`,
             jwtRefreshExpiration,
             JSON.stringify({
                 refreshToken,
@@ -37,8 +37,8 @@ const auth = {
             }));
     },
 
-    getRefreshToken: async (userId) => {
-        const refreshToken = await asyncClient.get(`${PREFIX}user${userId}-refreshToken`);
+    getRefreshToken: async (userId, accessToken) => {
+        const refreshToken = await asyncClient.get(`${PREFIX}user${userId}-${accessToken}`);
 
         if (!refreshToken) {
             throw new Error("refresh token is invalid or expired")
@@ -47,8 +47,8 @@ const auth = {
         return JSON.parse(refreshToken)
     },
 
-    deleteRefreshToken: async (userId) => {
-        await asyncClient.del(`${PREFIX}user${userId}-refreshToken`);
+    deleteRefreshToken: async (userId, accessToken) => {
+        await asyncClient.del(`${PREFIX}user${userId}-${accessToken}`);
     }
 };
 
