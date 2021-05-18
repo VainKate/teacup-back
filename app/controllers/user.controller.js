@@ -1,5 +1,4 @@
 const { User, Tag, Channel } = require("../models");
-const { QueryTypes } = require('sequelize');
 
 const userController = {
     /**
@@ -10,7 +9,7 @@ const userController = {
      */
 
     update: async (req, res) => {
-        const id = req.params.id;
+        const id = req.userId;
         const { email, nickname, tags } = req.body;
 
         try {
@@ -50,7 +49,7 @@ const userController = {
 
     delete: async (req, res) => {
         // store id in a const with incoming request parameters id
-        const id = parseInt(req.params.id);
+        const id = req.userId;
         try {
             // delete the user
             const deleted = await User.destroy({ where: { id } });
@@ -70,42 +69,71 @@ const userController = {
     },
 
     getUserChannels: async (req, res) => {
-        // store id in a const with incoming request body id
-        const id = parseInt(req.body.id);
+        const id = req.userId;
 
         try {
-            const channelIdsFromUser = await sequelize.query(
-                `SELECT channel_id FROM public.channel_has_tag
-                WHERE tag_id in 
-                (SELECT "tags"."id" AS "tags.id" FROM "user" AS "User" LEFT OUTER JOIN 
-                    ( "user_has_tag" AS "tags->user_has_tag" INNER JOIN "tag" AS "tags" 
-                    ON "tags"."id" = "tags->user_has_tag"."tag_id") 
-                ON "User"."id" = "tags->user_has_tag"."user_id" WHERE "User"."id" = ${id});`
-                );
-
-                console.log(channelIdsFromUser);
-                
-                const channels = Channel.findAll({
-                    where: { id: channelIdFromUser },
-                    include : {
-                        association : 'tags',
+            const channels = await Channel.findAll({
+                include: [
+                    {
+                        association: "users",
+                        through: {
+                            attributes: []
+                        },
+                        attributes: [],
+                        where: {
+                            id
+                        },
+                        required: true
+                    },
+                    {
+                        association: "tags",
+                        through: {
+                            attributes: []
+                        },
                     }
-                });
+                ]
+            });
 
-            if (!user) {
-                return res.status(400).send("No user found.");
-            }
-
-            // send a 200 status and user's channels
             res.status(200).json(channels);
+        } catch (error) {
+            res.status(500).json(error.parent?.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
+        }
+    },
+
+    getRecommendedChannels: async (req, res) => {
+        try {
+
+            const recommendedChannels = await Channel.findAll({
+                include: {
+                    association: "tags",
+                    through: {
+                        attributes: [],
+                    },
+                    include: {
+                        association: "users",
+                        attributes: [],
+                        through: {
+                            attributes: []
+                        },
+                        where: {
+                            id: req.userId,
+                        },
+                    },
+                    required: true
+                },
+            });
+
+
+            res.status(200).json(recommendedChannels);
 
         } catch (error) {
-            res.status(500).send('Error !!!!');
+            res.status(500).json(error.parent?.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
         }
     }
 };
-
-//    1            3            8           11      23
-// Cuisine Variété française Mangas/Anime Action Réflexion
 
 module.exports = userController;

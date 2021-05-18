@@ -5,7 +5,7 @@ const client = process.env.NODE_ENV === 'production' ?
     redis.createClient()
 
 client.on("connect", () => {
-    console.log("Redis connected.")
+    console.log("Connection to Redis has been established successfully.")
 })
 
 const { promisify } = require('util');
@@ -20,6 +20,11 @@ const asyncClient = {
     zrange: promisify(client.zrange).bind(client),
     zscore: promisify(client.zscore).bind(client),
     zrangebyscore: promisify(client.zrangebyscore).bind(client),
+    setex: promisify(client.setex).bind(client),
+    get: promisify(client.get).bind(client),
+    del: promisify(client.del).bind(client),
+    scan: promisify(client.scan).bind(client)
+
 };
 
 module.exports = asyncClient;

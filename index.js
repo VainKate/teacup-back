@@ -1,24 +1,37 @@
 require('dotenv').config();
 
 const express = require('express');
+const cookieParser = require('cookie-parser');
 
 const { Server } = require('socket.io');
 const { createServer } = require('http')
 const cors = require('cors')
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+    origin: ['http://localhost:8080', 'http://teacup.quillers.fr'],
+    credentials: true
+}
+app.use(cors(corsOptions));
+app.use(cookieParser());
 
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST'],
-        allowedHeaders: ['Access-Control-Allow-Headers', 'Origin', 'X-Requested-With', 'Content-Type', 'Accept']
+const io = new Server(httpServer,
+    {
+        cors: {
+            origin: ['http://localhost:8080', 'http://teacup.quillers.fr'],
+            allowedHeaders: [
+                'Access-Control-Allow-Headers',
+                'Origin',
+                'X-Requested-With',
+                'Content-Type',
+                'Accept'
+            ],
+        }
     }
-});
+);
 
-const apiRouter = require('./app/router');
+const apiRouter = require('./app/routes/router');
 const socketHandler = require('./app/services/socket.handler');
 
 const PORT = process.env.PORT || 8000;
