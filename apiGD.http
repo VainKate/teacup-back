@@ -1,13 +1,14 @@
 ### PATCH /v1/me
 PATCH http://localhost:5435/v1/me
-access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTM1MjcwMSwiZXhwIjoxNjIxMzUyNzYxfQ.Aoyb7vIXn5o3oz_BICLJzQPMhJa7ZWZnkFWg-j0EG5U
-refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTM1MjcwMSwiZXhwIjoxNjIxMzUzMDAxfQ.fZcYL7jRwm2qY9Rhs9aKcQJguXi8u_k8jOF6upOn2Xk
+access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTM1NjkxOCwiZXhwIjoxNjIxMzU2OTc4fQ.ux7JRV2wROEAp8p0lLSfN4kEbnTj6G13FWWtXxmjm0A
+refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTM1NjkxOCwiZXhwIjoxNjIxMzU3MjE4fQ.Uy8PhVvjJE6lLnzd2fuZixYvjRfr0JnadZtDlavrcE8
 Content-Type: application/json
 
 {
     "email" : "lulu@lulu.com",
     "password" : "lulu",
-    "newPassword" : "azerty"
+    "newPassword" : "azerty",
+    "userId" : 53
 }
 
 #------------------------------------------------

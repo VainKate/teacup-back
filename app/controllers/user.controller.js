@@ -1,5 +1,7 @@
 const { User, Tag, Channel } = require("../models");
 
+const SALT_ROUNDS = 10;
+
 const userController = {
     /**
      *
@@ -69,7 +71,7 @@ const userController = {
             return res.status(409).send(`Please enter your old password, otherwise reset password`);
         }
 
-        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+        const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
         newPassword = await user.update({
             password: hashedPassword,
