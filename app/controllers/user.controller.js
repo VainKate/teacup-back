@@ -70,17 +70,6 @@ const userController = {
 
     getRecommendedChannels: async (req, res) => {
         try {
-            const userTags = await Tag.findAll({ 
-                include: { 
-                    association : "users",
-                    through : {
-                        attributes : []
-                    },
-                    where: {
-                        id : req.userId
-                    }
-                 } })
-
 
             const recommendedChannels = await Channel.findAll({
                 include: {
@@ -88,9 +77,17 @@ const userController = {
                     through: {
                         attributes: [],
                     },
-                    where: {
-                        id: userTags.map(({ id }) => id),
+                    include: {
+                        association: "users",
+                        attributes : [],
+                        through: {
+                            attributes: []
+                        },
+                        where: {
+                            id: req.userId,
+                        },
                     },
+                    required : true
                 },
             });
 
