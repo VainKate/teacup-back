@@ -71,11 +71,11 @@ const userController = {
     profile: async (req, res) => {
         try {
             const user = await User.findByPk(req.userId,
-                { 
+                {
                     include: {
-                        association : "tags",
-                        through : {
-                            attributes : []
+                        association: "tags",
+                        through: {
+                            attributes: []
                         }
                     }
                 });
@@ -83,7 +83,40 @@ const userController = {
             res.status(200).json(user);
 
         } catch (error) {
-            console.log(error)
+            res.status(500).json(error.parent?.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
+        }
+    },
+
+    getUserChannels: async (req, res) => {
+        const id = req.userId;
+
+        try {
+            const channels = await Channel.findAll({
+                include: [
+                    {
+                        association: "users",
+                        through: {
+                            attributes: []
+                        },
+                        attributes: [],
+                        where: {
+                            id
+                        },
+                        required: true
+                    },
+                    {
+                        association: "tags",
+                        through: {
+                            attributes: []
+                        },
+                    }
+                ]
+            });
+
+            res.status(200).json(channels);
+        } catch (error) {
             res.status(500).json(error.parent?.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });
@@ -101,7 +134,7 @@ const userController = {
                     },
                     include: {
                         association: "users",
-                        attributes : [],
+                        attributes: [],
                         through: {
                             attributes: []
                         },
@@ -109,7 +142,7 @@ const userController = {
                             id: req.userId,
                         },
                     },
-                    required : true
+                    required: true
                 },
             });
 
@@ -117,7 +150,6 @@ const userController = {
             res.status(200).json(recommendedChannels);
 
         } catch (error) {
-            console.log(error)
             res.status(500).json(error.parent?.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });

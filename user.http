@@ -4,6 +4,12 @@ Content-Type: application/json
 
 #------------------------------------------------
 
+### GET /v1/me/channels
+GET http://localhost:8000/v1/me/channels
+Content-Type: application/json
+
+#------------------------------------------------
+
 ### GET /v1/me/recommended 
 GET http://localhost:8000/v1/me/recommended
 Content-Type: application/json

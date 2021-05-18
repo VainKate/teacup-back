@@ -7,7 +7,8 @@ module.exports = (sequelize, DataTypes, Model) => {
             type: DataTypes.TEXT,
             unique: true,
             allowNull: false
-        }
+        },
+        
     }, {
         sequelize,
         modelName: 'Tag',
