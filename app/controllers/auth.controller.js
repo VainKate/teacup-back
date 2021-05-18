@@ -1,5 +1,12 @@
+const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+
 const { User, Channel } = require("../models");
-let bcrypt = require("bcrypt");
+const authService = require('../services/auth.service');
+
+const SALT_ROUNDS = 10;
+const JWT_SECRET = process.env.JWT_SECRET
+
 
 const authController = {
     /**
@@ -34,10 +41,9 @@ const authController = {
                     );
             }
 
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-            let newUser = await User.create({
+            const newUser = await User.create({
                 email,
                 password: hashedPassword,
                 nickname,
@@ -82,11 +88,11 @@ const authController = {
                 },
             });
 
-            const isPasswordValid = user
-                ? await bcrypt.compare(password, user.password)
-                : false;
+            const isPasswordValid = user ?
+                await bcrypt.compare(password, user.password) :
+                false;
 
-            if (!user || !isPasswordValid) {
+            if (!isPasswordValid) {
                 return res.status(409).send(`Your credentials are invalid.`);
             }
 
@@ -102,18 +108,54 @@ const authController = {
                 },
             });
 
-            // const userWithRecommendations = [{ user }, { recommendedChannels }]
-
-            // res.json(userWithRecommendations)
-
             user.recommendedChannels = recommendedChannels;
 
-            res.json(user);
+            const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
+
+            res.cookie("access_token", accessToken, {
+                httpOnly: true
+            });
+
+            res.cookie("refresh_token", refreshToken, {
+                httpOnly: true
+            });
+
+            res.status(200).json(user)
 
         } catch (error) {
-            return res.status(400).send(error.message);
+            console.log(error)
+            res.status(500).json(error.parent?.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
         }
     },
+
+    logout: async (req, res) => {
+        try {
+            if (!req.cookies.access_token || !req.cookies.refresh_token) {
+                return res.status(401).send('User is already logout')
+            }
+
+            const decoded = jwt.verify(req.cookies.access_token, JWT_SECRET, {
+                ignoreExpiration: true
+            })
+
+            await authService.deleteRefreshToken(decoded.id, req.cookies.access_token);
+
+            res.clearCookie("access_token");
+            res.clearCookie("refresh_token");
+
+            res.status(200).send('Logout succeed');
+
+        } catch (error) {
+            res.status(401).json(error.name !== 'Error' ?
+            error :
+            {
+                "message": error.message
+            })
+        }
+
+    }
 };
 
 module.exports = authController;

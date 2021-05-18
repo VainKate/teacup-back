@@ -1,12 +1,12 @@
 #------------------------------------------------
 
 ### PUT /v1/user/:id (success) update all
-PUT http://localhost:8000/v1/users/51
+PUT http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
     "email" : "supahaka@testmail.com",
-    "nickname" : "SUPAHAKA",
+    "nickname" : "SUPAHAKA2",
     "tags" : [1, 10, 11, 12, 14, 18, 19]
 
 }

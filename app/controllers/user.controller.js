@@ -9,7 +9,7 @@ const userController = {
      */
 
     update: async (req, res) => {
-        const id = req.params.id;
+        const id = req.userId;
         const { email, nickname, tags } = req.body;
 
         try {
@@ -49,7 +49,7 @@ const userController = {
 
     delete: async (req, res) => {
         // store id in a const with incoming request parameters id
-        const id = parseInt(req.params.id);
+        const id = parseInt(req.userId);
         try {
             // delete the user
             const deleted = await User.destroy({ where: { id } });
