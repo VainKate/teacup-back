@@ -69,9 +69,6 @@ const authController = {
             const user = await User.findOne({ where: { email } });
     
             const success = user ? true : false;
-
-            console.log(user);
-            console.log(success)
     
             await mailerService.test(email, success);
     

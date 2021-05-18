@@ -14,7 +14,7 @@ POST http://localhost:8000/v1/forgot-pwd
 Content-Type: application/json
 
 {
-    "email" : "caitlin.sigrist.pub@gmail.com"
+    "email" : "caitlin.sigrist@gmail.com"
 }
 
 #------------------------------------------------

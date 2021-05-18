@@ -1,43 +1,44 @@
 const nodemailer = require('nodemailer');
+const Email = require('email-templates');
 
 const mailerService = {
     test: async (email, success) => {
         try {
-            // const testAccount = await nodemailer.createTestAccount();
-
-            // const transporter = nodemailer.createTransport({
-            //     host: "smtp.ethereal.email",
-            //     port: 587,
-            //     secure: false, // true for 465, false for other ports
-            //     auth: {
-            //         user: testAccount.user,
-            //         pass: testAccount.pass
-            //     },
-            // });
+            const testAccount = await nodemailer.createTestAccount();
 
             const transporter = nodemailer.createTransport({
-                port: 1025,
-                tls: {
-                    rejectUnauthorized: false
-                }
+                host: "smtp.ethereal.email",
+                port: 587,
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: testAccount.user,
+                    pass: testAccount.pass
+                },
             });
 
-            const message = success ?
-                {
-                    text: "Bonjour !\n\nNous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email.\nAucune modification n'a encore été apportée, rendez-vous à l'adresse ci-dessous pour réinitialiser votre mot de passe:\nhttp://placeholder.com\nSi vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message.\n\nL'équipe TeaCup", 
-                    html: "<b>Bonjour !<br><br>Nous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email.<br>Aucune modification n'a encore été apportée, cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe:<br>http://placeholder.com<br>Si vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message.<br><br>L'équipe TeaCup</b>"
-                } :
-                {
-                    text: "Bonjour !\n\nNous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email.\nMalheureusement il semblerait qu'aucun compte n'existe pour cette adresse. Essayez une autre adresse email ou créez un compte avec celle-ci en vous rendant à l'adresse ci-dessous:\nhttp://placeholder.com\nSi vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message.\n\nL'équipe TeaCup", 
-                    html: "<b>Bonjour !<br><br>Nous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email.<br>Malheureusement il semblerait qu'aucun compte n'existe pour cette adresse. Essayez une autre adresse email ou créez un compte avec celle-ci en cliquant sur le lien ci-dessous:<br>http://placeholder.com<br>Si vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message.<br><br>L'équipe TeaCup</b>"
-                };
+            // const transporter = nodemailer.createTransport({
+            //     port: 1025,
+            //     tls: {
+            //         rejectUnauthorized: false
+            //     }
+            // });
+
+            const html = new Email()
+
+            const emailTemplate = await html.render('forgotPwd', {
+                success
+            });
+
+            const text = success ?
+                "Bonjour !\n\nNous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email.\nAucune modification n'a encore été apportée, rendez-vous à l'adresse ci-dessous pour réinitialiser votre mot de passe:\nhttp://placeholder.com\nSi vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message.\n\nL'équipe TeaCup" :
+                "Bonjour !\n\nNous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email.\nMalheureusement il semblerait qu'aucun compte n'existe pour cette adresse. Essayez une autre adresse email ou créez un compte avec celle-ci en vous rendant à l'adresse ci-dessous:\nhttp://placeholder.com\nSi vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message.\n\nL'équipe TeaCup";
 
             const info = await transporter.sendMail({
                 from: 'TeaCup <ne_pas_repondre@gmail.com>',
                 to: email,
-                subject: "Mot de passe oublié ?", 
-                text : message.text,
-                html : message.html
+                subject: "Mot de passe oublié ?",
+                text,
+                html : emailTemplate
             });
 
             console.log("Message sent: %s", info.messageId);
