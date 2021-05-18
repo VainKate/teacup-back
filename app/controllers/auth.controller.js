@@ -66,20 +66,20 @@ const authController = {
                     .status(412)
                     .send('An email must be provided');
             }
-    
+
             const user = await User.findOne({ where: { email } });
-    
+
             const success = user ? true : false;
-    
-            await mailerService.test(email, success);
-    
-            res.status(200).send(`An email has been sent to ${email} with further instructions.`)
+
+            await mailerService.sendResetPassword(email, success);
+
+            res.status(200).json({
+                message: `An email has been sent to ${email} with further instructions.`
+            })
 
         } catch (error) {
-            console.log(error)
-            res.status(500).json(error !== 'Error' ?
-                error :
-                { message: error.message });
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 

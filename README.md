@@ -5,7 +5,8 @@
 - Node.js 14
 - NPM
 - PostgreSQL 12
-- [Redis 6.2.1](https://redis.io/download)
+- [Redis 6.2](https://redis.io/download)
+- [MailDev](https://www.npmjs.com/package/maildev)
 
 Ces outils sont nécessaires au bon fonctionnement de l'app, il est nécessaire de les installer avant de continuer.
 
@@ -17,14 +18,15 @@ Cloner le repo en local
 git clone <url de ce repo>
 ```
 
-Puis, dans ce dossier local, installer les dépendances NPM
+Puis, dans ce dossier local, installer les dépendances NPM.
 
 ```bash
 npm i
 ```
 
-Enfin, créer une base de données PostgreSQL et exécuter le fichier de seeding db-generate (`./data/db-generate.js`). 
+Créer une base de données PostgreSQL et exécuter le fichier de seeding db-generate (`./data/db-generate.js`). 
 La génération de la base de données prend quelques secondes à s'exécuter et génère également un utilisateur test qui sera utilisable avec les identifiants suivants :
+
 - email : testeur@testmail.com
 - mot de passe : 7357
 
@@ -35,9 +37,16 @@ npm run generate-db
 
 Penser à configurer PostgreSQL (ou à fournir les variables d'environnement nécessaires) pour que la commande `createdb` puisse s'exécuter correctement.
 
+Pour finir, afin de consulter les emails envoyés en local, lancer MailDev dans un terminal à part:
+
+```bash
+maildev
+```
+
 ## Lancement
 
-_**Attention**_ ! Dans le cas où redis-server ne serait pas lancé par défaut, il est nécessaire d'exécuter la commande suivante dans un terminal à part avant de démarrer le projet : 
+_**Attention**_ ! Dans le cas où redis-server ne serait pas lancé par défaut, il est nécessaire d'exécuter la commande suivante dans un terminal à part avant de démarrer le projet :
+
 ```bash
 redis-server
 ```
