@@ -67,6 +67,27 @@ const userController = {
                 { message: error.message });
         }
     },
+
+    profile: async (req, res) => {
+        try {
+            const user = await User.findByPk(req.userId,
+                { 
+                    include: {
+                        association : "tags",
+                        through : {
+                            attributes : []
+                        }
+                    }
+                });
+
+            res.status(200).json(user);
+
+        } catch (error) {
+            res.status(500).json(error.parent.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
+        }
+    }
 };
 
 module.exports = userController;
