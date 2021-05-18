@@ -22,9 +22,9 @@ const authController = {
             if (!email || !password || !nickname) {
                 return res
                     .status(412)
-                    .send(
-                        "Missing information, you need to provide an email, a password and a nickname"
-                    );
+                    .json({
+                        message: "Missing information, you need to provide an email, a password and a nickname"
+                    });
             }
 
             const emailExists = await User.findOne({
@@ -36,9 +36,9 @@ const authController = {
             if (emailExists) {
                 return res
                     .status(409)
-                    .send(
-                        `Validation error: The mail address is invalid or already in use`
-                    );
+                    .json({
+                        message: `Validation error: The mail address is invalid or already in use`
+                    });
             }
 
             const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -51,7 +51,8 @@ const authController = {
 
             return res.json(newUser);
         } catch (error) {
-            return res.status(400).send(error.message);
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 
@@ -62,9 +63,9 @@ const authController = {
             if (!email || !password) {
                 return res
                     .status(412)
-                    .send(
-                        "Missing information, you need to provide an email and a password"
-                    );
+                    .json({
+                        message: "Missing information, you need to provide an email and a password"
+                    });
             }
 
             const user = await User.scope('withPassword').findOne({
@@ -93,7 +94,9 @@ const authController = {
                 false;
 
             if (!isPasswordValid) {
-                return res.status(409).send(`Your credentials are invalid.`);
+                return res.status(409).json({
+                    messsage : `Your credentials are invalid.`
+                });
             }
 
             const recommendedChannels = await Channel.findAll({
@@ -123,17 +126,17 @@ const authController = {
             res.status(200).json(user)
 
         } catch (error) {
-            console.log(error)
-            res.status(500).json(error.parent?.detail ?
-                { message: error.parent.detail } :
-                { message: error.message });
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 
     logout: async (req, res) => {
         try {
             if (!req.cookies.access_token || !req.cookies.refresh_token) {
-                return res.status(401).send('User is already logout')
+                return res.status(401).json({
+                    message : 'User is already logout'
+                })
             }
 
             const decoded = jwt.verify(req.cookies.access_token, JWT_SECRET, {
@@ -148,11 +151,8 @@ const authController = {
             res.status(200).send('Logout succeed');
 
         } catch (error) {
-            res.status(401).json(error.name !== 'Error' ?
-            error :
-            {
-                "message": error.message
-            })
+            const message = error.parent.detail || error.message
+            res.status(400).json({ message });
         }
 
     }
