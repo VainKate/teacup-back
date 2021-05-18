@@ -6,29 +6,29 @@ const tagController = {
             const tags = await Tag.findAll();
 
             res.json(tags)
-        }
 
-        catch (err) {
-            return res.status(500).send(err.message);
+        } catch (error) {
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 
     getAllTagsWithChannels: async (_, res) => {
         try {
             const tags = await Tag.findAll({
-                include : {
-                    association : 'channels',
-                    through : {
-                        attributes : []
+                include: {
+                    association: 'channels',
+                    through: {
+                        attributes: []
                     }
                 }
             });
 
             res.json(tags)
-        }
 
-        catch (err) {
-            return res.status(500).send(err.message);
+        } catch (error) {
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     }
 }

@@ -27,7 +27,7 @@ const userController = {
             const user = await User.findByPk(id, options);
 
             if (!user) {
-                return res.status(400).send("No user found.");
+                return res.status(400).json({ message: "No user found." });
             }
 
             await user.update({ email, nickname });
@@ -41,9 +41,8 @@ const userController = {
             res.status(200).json(user);
 
         } catch (error) {
-            res.status(500).json(error.parent.detail ?
-                { message: error.parent.detail } :
-                { message: error.message });
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 
@@ -97,12 +96,11 @@ const userController = {
             }
 
             // send a 200 status and a message to show that user has been deleted
-            res.status(200).send(`User account successfully deleted`);
+            res.status(200).json({ message: `User account successfully deleted` });
 
         } catch (error) {
-            res.status(500).json(error.parent.detail ?
-                { message: error.parent.detail } :
-                { message: error.message });
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 
@@ -121,9 +119,8 @@ const userController = {
             res.status(200).json(user);
 
         } catch (error) {
-            res.status(500).json(error.parent.detail ?
-                { message: error.parent.detail } :
-                { message: error.message });
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 
@@ -154,10 +151,16 @@ const userController = {
             });
 
             res.status(200).json(channels);
+
         } catch (error) {
+<<<<<<< HEAD
             res.status(500).json(error.parent.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });
+=======
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
+>>>>>>> 438fdedd9781aa4e093e0ac469f0aa930ddda29b
         }
     },
 
@@ -188,9 +191,14 @@ const userController = {
             res.status(200).json(recommendedChannels);
 
         } catch (error) {
+<<<<<<< HEAD
             res.status(500).json(error.parent.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });
+=======
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
+>>>>>>> 438fdedd9781aa4e093e0ac469f0aa930ddda29b
         }
     }
 };
