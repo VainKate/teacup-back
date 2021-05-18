@@ -1,5 +1,12 @@
 #------------------------------------------------
 
+### GET /v1/me/recommended 
+GET http://localhost:8000/v1/me/recommended
+Content-Type: application/json
+
+
+#------------------------------------------------
+
 ### PUT /v1/user/:id (success) update all
 PUT http://localhost:8000/v1/me
 Content-Type: application/json

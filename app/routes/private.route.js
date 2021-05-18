@@ -7,6 +7,7 @@ const { channelController, tagController, userController } = require("../control
 router.put('/me', userController.update);
 // [delete] route for delete user
 router.delete('/me', userController.delete);
+router.get('/me/recommended', userController.getRecommendedChannels);
 
 router.get('/channels', channelController.getAllChannels);
 router.get('/channel/:id(\\d+)', channelController.getChannelById);
