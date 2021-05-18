@@ -78,9 +78,8 @@ const userController = {
         return res.status(200).json(`Password updated`);
 
         } catch (error) {
-        res.status(500).json(error.parent.detail ?
-            { message: error.parent.detail } :
-            { message: error.message });
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 

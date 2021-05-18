@@ -1,0 +1,39 @@
+### PATCH /v1/me
+PATCH http://localhost:5435/v1/me
+access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTM1MjcwMSwiZXhwIjoxNjIxMzUyNzYxfQ.Aoyb7vIXn5o3oz_BICLJzQPMhJa7ZWZnkFWg-j0EG5U
+refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTM1MjcwMSwiZXhwIjoxNjIxMzUzMDAxfQ.fZcYL7jRwm2qY9Rhs9aKcQJguXi8u_k8jOF6upOn2Xk
+Content-Type: application/json
+
+{
+    "email" : "lulu@lulu.com",
+    "password" : "lulu",
+    "newPassword" : "azerty"
+}
+
+#------------------------------------------------
+
+### GET /v1/login
+POST http://localhost:5435/v1/login
+Content-Type: application/json
+
+{
+    "email" : "lulu@lulu.com",
+    "password" : "lulu"
+}
+
+#------------------------------------------------
+
+### GET /v1/channel/:id (try to access to a resource)
+GET http://localhost:5435/v1/channel/1
+Content-Type: application/json
+
+#------------------------------------------------
+
+### GET /v1/logout
+POST http://localhost:5435/v1/logout
+Content-Type: application/json
+
+{
+    "id" : 51
+}
+
