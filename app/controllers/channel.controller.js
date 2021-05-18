@@ -9,7 +9,7 @@ const channelController = {
             const channel = await Channel.findByPk(req.params.id, {
                 include: {
                     association: 'users',
-                    attributes: ['id', 'nickname','isLogged'],
+                    attributes: ['id', 'nickname', 'isLogged'],
                     through: {
                         attributes: []
                     }
@@ -17,36 +17,37 @@ const channelController = {
             });
 
             if (!channel) {
-                return res.status(404).send('Channel not found')
+                return res.status(404).json({ message: 'Channel not found' });
             };
 
-            for (const user of channel.users){
+            for (const user of channel.users) {
                 user.isLogged = onlineList.includes(user.id.toString()) ? true : false;
             }
 
             return res.json(channel);
-        }
-        catch (err) {
-            res.status(500).send(err.message);
+
+        } catch (error) {
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     },
 
     getAllChannels: async (_, res) => {
         try {
             const channels = await Channel.findAll({
-                include : {
-                    association : 'tags',
-                    through : {
-                        attributes : []
+                include: {
+                    association: 'tags',
+                    through: {
+                        attributes: []
                     }
                 }
             });
 
             return res.json(channels);
-        }
-
-        catch (err) {
-            res.status(500).send(err.message);
+            
+        } catch (error) {
+            const message = error.parent.detail || error.message
+            res.status(500).json({ message });
         }
     }
 }

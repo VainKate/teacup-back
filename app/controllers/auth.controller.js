@@ -95,7 +95,7 @@ const authController = {
 
             if (!isPasswordValid) {
                 return res.status(409).json({
-                    messsage : `Your credentials are invalid.`
+                    messsage: `Your credentials are invalid.`
                 });
             }
 
@@ -135,7 +135,7 @@ const authController = {
         try {
             if (!req.cookies.access_token || !req.cookies.refresh_token) {
                 return res.status(401).json({
-                    message : 'User is already logout'
+                    message: 'User is already logout'
                 })
             }
 
@@ -148,13 +148,12 @@ const authController = {
             res.clearCookie("access_token");
             res.clearCookie("refresh_token");
 
-            res.status(200).send('Logout succeed');
+            res.status(200).json({ message: 'Logout succeed' });
 
         } catch (error) {
             const message = error.parent.detail || error.message
             res.status(400).json({ message });
         }
-
     }
 };
 
