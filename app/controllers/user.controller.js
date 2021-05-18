@@ -72,7 +72,7 @@ const userController = {
 
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-        newPassword = await User.create({
+        newPassword = await user.update({
             password: hashedPassword,
         });
 
