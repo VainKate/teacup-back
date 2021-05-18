@@ -9,6 +9,16 @@ Content-Type: application/json
 
 #------------------------------------------------
 
+### GET /v1/forgot-pwd
+POST http://localhost:8000/v1/forgot-pwd
+Content-Type: application/json
+
+{
+    "email" : "caitlin.sigrist@gmail.com"
+}
+
+#------------------------------------------------
+
 ### GET /v1/channel/:id (try to access to a resource)
 GET http://localhost:8000/v1/channel/1
 Content-Type: application/json

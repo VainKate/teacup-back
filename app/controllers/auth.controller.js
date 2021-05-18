@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const { User, Channel } = require("../models");
 const authService = require('../services/auth.service');
+const mailerService = require("../services/mailer.service");
 
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET
@@ -52,6 +53,36 @@ const authController = {
             return res.json(newUser);
         } catch (error) {
             return res.status(400).send(error.message);
+        }
+    },
+
+    forgotPwd: async (req, res) => {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                return res
+                    .status(412)
+                    .send('An email must be provided');
+            }
+    
+            const user = User.findOne({ where: { email } });
+    
+            if(!user){
+                return res
+                    .status(404)
+                    .send('User not found')
+            };
+    
+            await mailerService.test(email);
+    
+            res.status(200).send('Reset password mail has been sent.')
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error !== 'Error' ?
+                error :
+                { message: error.message });
         }
     },
 
@@ -149,10 +180,10 @@ const authController = {
 
         } catch (error) {
             res.status(401).json(error.name !== 'Error' ?
-            error :
-            {
-                "message": error.message
-            })
+                error :
+                {
+                    "message": error.message
+                })
         }
 
     }
