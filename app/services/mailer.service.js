@@ -4,17 +4,15 @@ const Email = require('email-templates');
 const mailerService = {
     test: async (email, success) => {
         try {
-            const testAccount = await nodemailer.createTestAccount();
-
-            const transporter = nodemailer.createTransport({
-                host: "smtp.ethereal.email",
-                port: 587,
-                secure: false, // true for 465, false for other ports
-                auth: {
-                    user: testAccount.user,
-                    pass: testAccount.pass
-                },
-            });
+            // const transporter = nodemailer.createTransport({
+            //     host: "smtp.ethereal.email",
+            //     port: 587,
+            //     secure: false,
+            //     auth: {
+            //         user: testAccount.user,
+            //         pass: testAccount.pass
+            //     },
+            // });
 
             // const transporter = nodemailer.createTransport({
             //     port: 1025,
@@ -22,6 +20,17 @@ const mailerService = {
             //         rejectUnauthorized: false
             //     }
             // });
+
+            const transporter = nodemailer.createTransport({
+                service : 'Gmail',
+                host: "smtp.gmail.com",
+                port: 587,
+                secure: false, // use SSL
+                auth: {
+                    user: process.env.EMAIL,
+                    pass: process.env.EMAIL_PWD
+                },
+            });
 
             const html = new Email()
 
