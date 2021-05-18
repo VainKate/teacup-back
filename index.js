@@ -9,21 +9,8 @@ const cors = require('cors')
 
 const app = express();
 const corsOptions = {
-    // Ceci est du bricolage pour avoir un accès depuis toutes origines sans provoquer l'erreur si origin: '*', ça devrait fonctionner depuis le server par exemple.
-    // origin: (origin, callback) => {
-    //     return callback(null, true)
-    // },
     origin: ['http://localhost:8080', 'http://teacup.quillers.fr'],
-    methods: ['GET', 'POST'],
-    // Indique que les tokens sont demandés dans la réponse
-    credentials: true,
-    //     allowedHeaders: [
-    //         'Access-Control-Allow-Headers', 
-    //         'Origin', 
-    //         'X-Requested-With',
-    //         'Content-Type',
-    //         'Accept',
-    //     ],
+    credentials: true
 }
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -32,14 +19,13 @@ const httpServer = createServer(app);
 const io = new Server(httpServer,
     {
         cors: {
-            origin: '*',
-            methods: ['GET', 'POST'],
+            origin: ['http://localhost:8080', 'http://teacup.quillers.fr'],
             allowedHeaders: [
                 'Access-Control-Allow-Headers',
                 'Origin',
                 'X-Requested-With',
                 'Content-Type',
-                'Accept',
+                'Accept'
             ],
         }
     }
