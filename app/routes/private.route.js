@@ -5,7 +5,6 @@ const { channelController, tagController, userController } = require("../control
 
 // [put] route for update user
 router.put('/me', userController.update);
-
 // [delete] route for delete user
 router.delete('/me', userController.delete);
 
