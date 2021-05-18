@@ -47,6 +47,44 @@ const userController = {
         }
     },
 
+    updatePassword: async (req, res) => {
+        // on récupère l'ancien mot de passe dans req.body
+        const password = req.body.password;
+        const newPassword = req.body.newPassword;
+
+        const id = req.userId;
+
+        try {
+
+            const user = await User.findByPk(id);
+
+            if (!user) {
+                return res.status(400).send("No user found.");
+            }
+
+            const isOldPasswordValid = user ?
+            await bcrypt.compare(password, user.password) :
+            false;
+
+        if (!isOldPasswordValid) {
+            return res.status(409).send(`Please enter your old password, otherwise reset password`);
+        }
+
+        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
+        newPassword = await User.create({
+            password: hashedPassword,
+        });
+
+        return res.status(200).json(`Password updated`);
+
+        } catch (error) {
+        res.status(500).json(error.parent.detail ?
+            { message: error.parent.detail } :
+            { message: error.message });
+        }
+    },
+
     delete: async (req, res) => {
         // store id in a const with incoming request parameters id
         const id = req.userId;
