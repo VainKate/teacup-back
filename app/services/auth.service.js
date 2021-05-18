@@ -15,7 +15,7 @@ const jwtRefreshExpiration = process.env.NODE_ENV === 'production' ?
 const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
 const auth = {
-    generateTokens: async (payload) => {
+    generateTokens: async (payload, previousAccessToken) => {
         const accessToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration
         });
@@ -23,22 +23,26 @@ const auth = {
             expiresIn: jwtRefreshExpiration
         });
 
-        await auth.saveRefreshToken(payload.id, accessToken, refreshToken);
+        await auth.saveRefreshToken(payload.id, accessToken, refreshToken, previousAccessToken);
 
         return { accessToken, refreshToken }
     },
 
-    saveRefreshToken: async (userId, accessToken, refreshToken) => {
-        await asyncClient.setex(`${PREFIX}user${userId}-${accessToken}`,
+    saveRefreshToken: async (userId, accessToken, refreshToken, previousAccessToken) => {
+        if (previousAccessToken) {
+            await asyncClient.del(`${PREFIX}refreshToken-user${userId}-${previousAccessToken}`);
+        };
+
+        await asyncClient.setex(`${PREFIX}refreshToken-user${userId}-${accessToken}`,
             jwtRefreshExpiration,
             JSON.stringify({
                 refreshToken,
                 expires: refreshTokenMaxAge
-            }));
+            }))
     },
 
     getRefreshToken: async (userId, accessToken) => {
-        const refreshToken = await asyncClient.get(`${PREFIX}user${userId}-${accessToken}`);
+        const refreshToken = await asyncClient.get(`${PREFIX}refreshToken-user${userId}-${accessToken}`);
 
         if (!refreshToken) {
             throw new Error("refresh token is invalid or expired")
@@ -48,7 +52,17 @@ const auth = {
     },
 
     deleteRefreshToken: async (userId, accessToken) => {
-        await asyncClient.del(`${PREFIX}user${userId}-${accessToken}`);
+        await asyncClient.del(`${PREFIX}refreshToken-user${userId}-${accessToken}`);
+    },
+
+    deleteAllRefreshToken: async (userId) => {
+        let cursor;
+        const pattern = `${PREFIX}refreshToken-user${userId}-*`
+
+        do {
+            [cursor, keys] = await asyncClient.scan(cursor || 0, 'MATCH', pattern);
+            await Promise.all(keys.map((key) => asyncClient.del(key)));
+        } while (cursor !== '0');
     }
 };
 

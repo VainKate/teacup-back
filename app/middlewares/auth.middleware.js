@@ -33,7 +33,7 @@ const verifyJWT = async (req, res, next) => {
                 throw new Error("refresh token is invalid or expired");
             };
 
-            const { accessToken : newAccessToken, refreshToken: newRefreshToken } = await authService.generateTokens({ id: decoded.id });
+            const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await authService.generateTokens({ id: decoded.id }, accessToken);
 
             res.cookie("access_token", newAccessToken, {
                 httpOnly: true
@@ -48,11 +48,12 @@ const verifyJWT = async (req, res, next) => {
         })
     }
 
-    catch (err) {
-        res.status(401).json(err.name !== 'Error' ?
-            err :
+    catch (error) {
+        console.log(error)
+        res.status(401).json(error.name !== 'Error' ?
+            error :
             {
-                "message": err.message
+                "message": error.message
             })
     }
 

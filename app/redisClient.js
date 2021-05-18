@@ -22,7 +22,9 @@ const asyncClient = {
     zrangebyscore: promisify(client.zrangebyscore).bind(client),
     setex: promisify(client.setex).bind(client),
     get: promisify(client.get).bind(client),
-    del: promisify(client.del).bind(client)
+    del: promisify(client.del).bind(client),
+    scan: promisify(client.scan).bind(client)
+
 };
 
 module.exports = asyncClient;

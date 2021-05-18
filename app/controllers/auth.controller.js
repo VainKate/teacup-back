@@ -123,6 +123,7 @@ const authController = {
             res.status(200).json(user)
 
         } catch (error) {
+            console.log(error)
             res.status(500).json(error.parent?.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });
@@ -147,10 +148,10 @@ const authController = {
             res.status(200).send('Logout succeed');
 
         } catch (error) {
-            res.status(401).json(err.name !== 'Error' ?
-            err :
+            res.status(401).json(error.name !== 'Error' ?
+            error :
             {
-                "message": err.message
+                "message": error.message
             })
         }
 
