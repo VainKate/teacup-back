@@ -153,14 +153,8 @@ const userController = {
             res.status(200).json(channels);
 
         } catch (error) {
-<<<<<<< HEAD
-            res.status(500).json(error.parent.detail ?
-                { message: error.parent.detail } :
-                { message: error.message });
-=======
             const message = error.parent.detail || error.message
             res.status(500).json({ message });
->>>>>>> 438fdedd9781aa4e093e0ac469f0aa930ddda29b
         }
     },
 
@@ -191,14 +185,8 @@ const userController = {
             res.status(200).json(recommendedChannels);
 
         } catch (error) {
-<<<<<<< HEAD
-            res.status(500).json(error.parent.detail ?
-                { message: error.parent.detail } :
-                { message: error.message });
-=======
             const message = error.parent.detail || error.message
             res.status(500).json({ message });
->>>>>>> 438fdedd9781aa4e093e0ac469f0aa930ddda29b
         }
     }
 };
