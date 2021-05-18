@@ -66,17 +66,16 @@ const authController = {
                     .send('An email must be provided');
             }
     
-            const user = User.findOne({ where: { email } });
+            const user = await User.findOne({ where: { email } });
     
-            if(!user){
-                return res
-                    .status(404)
-                    .send('User not found')
-            };
+            const success = user ? true : false;
+
+            console.log(user);
+            console.log(success)
     
-            await mailerService.test(email);
+            await mailerService.test(email, success);
     
-            res.status(200).send('Reset password mail has been sent.')
+            res.status(200).send(`An email has been sent to ${email} with further instructions.`)
 
         } catch (error) {
             console.log(error)

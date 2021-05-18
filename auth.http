@@ -3,7 +3,7 @@ POST http://localhost:8000/v1/login
 Content-Type: application/json
 
 {
-    "email" : "supahaka@testmail.com",
+    "email" : "caitlin.sigrist@gmail.com",
     "password" : "7357"
 }
 
@@ -14,7 +14,7 @@ POST http://localhost:8000/v1/forgot-pwd
 Content-Type: application/json
 
 {
-    "email" : "caitlin.sigrist@gmail.com"
+    "email" : "caitlin.sigrist.pub@gmail.com"
 }
 
 #------------------------------------------------

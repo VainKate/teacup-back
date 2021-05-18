@@ -63,10 +63,7 @@ Content-Type: application/json
 
 #------------------------------------------------
 
-### DELETE /v1/user/:id (success)
-DELETE http://localhost:8000/v1/users/47
+### DELETE /v1/me (success)
+DELETE http://localhost:8000/v1/me
 Content-Type: application/json
 
-### DELETE /v1/user/:id (deletion of inexistant user)
-DELETE http://localhost:8000/v1/users/53
-Content-Type: application/json
