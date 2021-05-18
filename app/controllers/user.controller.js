@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Tag, Channel } = require("../models");
 
 const userController = {
     /**
@@ -49,7 +49,7 @@ const userController = {
 
     delete: async (req, res) => {
         // store id in a const with incoming request parameters id
-        const id = parseInt(req.userId);
+        const id = req.userId;
         try {
             // delete the user
             const deleted = await User.destroy({ where: { id } });
@@ -67,6 +67,43 @@ const userController = {
                 { message: error.message });
         }
     },
+
+    getRecommendedChannels: async (req, res) => {
+        try {
+            const userTags = await Tag.findAll({ 
+                include: { 
+                    association : "users",
+                    through : {
+                        attributes : []
+                    },
+                    where: {
+                        id : req.userId
+                    }
+                 } })
+
+
+            const recommendedChannels = await Channel.findAll({
+                include: {
+                    association: "tags",
+                    through: {
+                        attributes: [],
+                    },
+                    where: {
+                        id: userTags.map(({ id }) => id),
+                    },
+                },
+            });
+
+
+            res.status(200).json(recommendedChannels);
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(error.parent?.detail ?
+                { message: error.parent.detail } :
+                { message: error.message });
+        }
+    }
 };
 
 module.exports = userController;
