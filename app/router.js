@@ -20,4 +20,7 @@ router.put('/users/:id(\\d+)', userController.update);
 // [delete] route for delete user
 router.delete('/users/:id(\\d+)', userController.delete);
 
+// [get] route for my channels
+router.get('/me/channels', userController.getUserChannels);
+
 module.exports = router;

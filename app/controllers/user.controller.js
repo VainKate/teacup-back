@@ -1,4 +1,5 @@
-const { User } = require("../models");
+const { User, Tag, Channel } = require("../models");
+const { QueryTypes } = require('sequelize');
 
 const userController = {
     /**
@@ -67,6 +68,44 @@ const userController = {
                 { message: error.message });
         }
     },
+
+    getUserChannels: async (req, res) => {
+        // store id in a const with incoming request body id
+        const id = parseInt(req.body.id);
+
+        try {
+            const channelIdsFromUser = await sequelize.query(
+                `SELECT channel_id FROM public.channel_has_tag
+                WHERE tag_id in 
+                (SELECT "tags"."id" AS "tags.id" FROM "user" AS "User" LEFT OUTER JOIN 
+                    ( "user_has_tag" AS "tags->user_has_tag" INNER JOIN "tag" AS "tags" 
+                    ON "tags"."id" = "tags->user_has_tag"."tag_id") 
+                ON "User"."id" = "tags->user_has_tag"."user_id" WHERE "User"."id" = ${id});`
+                );
+
+                console.log(channelIdsFromUser);
+                
+                const channels = Channel.findAll({
+                    where: { id: channelIdFromUser },
+                    include : {
+                        association : 'tags',
+                    }
+                });
+
+            if (!user) {
+                return res.status(400).send("No user found.");
+            }
+
+            // send a 200 status and user's channels
+            res.status(200).json(channels);
+
+        } catch (error) {
+            res.status(500).send('Error !!!!');
+        }
+    }
 };
+
+//    1            3            8           11      23
+// Cuisine Variété française Mangas/Anime Action Réflexion
 
 module.exports = userController;
