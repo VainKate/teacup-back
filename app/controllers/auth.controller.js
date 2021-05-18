@@ -124,7 +124,7 @@ const authController = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json(error.parent?.detail ?
+            res.status(500).json(error.parent.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });
         }

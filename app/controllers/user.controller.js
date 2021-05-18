@@ -121,7 +121,7 @@ const userController = {
             res.status(200).json(user);
 
         } catch (error) {
-            res.status(500).json(error.parent?.detail ?
+            res.status(500).json(error.parent.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });
         }
@@ -155,7 +155,7 @@ const userController = {
 
             res.status(200).json(channels);
         } catch (error) {
-            res.status(500).json(error.parent?.detail ?
+            res.status(500).json(error.parent.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });
         }
@@ -188,7 +188,7 @@ const userController = {
             res.status(200).json(recommendedChannels);
 
         } catch (error) {
-            res.status(500).json(error.parent?.detail ?
+            res.status(500).json(error.parent.detail ?
                 { message: error.parent.detail } :
                 { message: error.message });
         }
