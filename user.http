@@ -1,3 +1,7 @@
+### GET /v1/me 
+GET http://localhost:8000/v1/me
+Content-Type: application/json
+
 #------------------------------------------------
 
 ### PUT /v1/user/:id (success) update all
