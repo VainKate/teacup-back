@@ -3,6 +3,7 @@ const router = Router();
 
 const { channelController, tagController, userController } = require("../controllers");
 
+router.get('/me', userController.profile)
 // [put] route for update user
 router.put('/me', userController.update);
 // [delete] route for delete user
