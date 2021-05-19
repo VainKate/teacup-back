@@ -54,7 +54,7 @@ const userController = {
         const newPassword = req.body.newPassword;
 
         const id = req.userId;
-
+        console.log(id);
         try {
 
             const user = await User.findByPk(id);
