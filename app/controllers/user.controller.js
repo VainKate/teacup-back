@@ -1,4 +1,5 @@
 const { User, Tag, Channel } = require("../models");
+const auth = require("../services/auth.service");
 
 const SALT_ROUNDS = 10;
 
@@ -50,8 +51,7 @@ const userController = {
 
     updatePassword: async (req, res) => {
         // on récupère l'ancien mot de passe dans req.body
-        const password = req.body.password;
-        const newPassword = req.body.newPassword;
+        const { password, newPassword } = req.body
 
         const id = req.userId;
         console.log(id);
@@ -59,28 +59,25 @@ const userController = {
 
             const user = await User.findByPk(id);
 
-            if (!user) {
-                return res.status(400).send("No user found.");
-            }
-
-            const isOldPasswordValid = user ?
-            await bcrypt.compare(password, user.password) :
+            const isPasswordValid = user ?
+            await bcrypt.compare(newPassword, user.password) :
             false;
 
-        if (!isOldPasswordValid) {
-            return res.status(409).send(`Please enter your old password, otherwise reset password`);
+        if (!isPasswordValid) {
+            return res.status(409).json({ message : 'The current password is incorrect' });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
-        newPassword = await user.update({
-            password: hashedPassword,
-        });
+        user.password = hashedPassword;
+        await user.save();
+
+        auth.deleteAllRefreshToken(id);
 
         return res.status(200).json(`Password updated`);
 
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
     },
