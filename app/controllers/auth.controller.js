@@ -51,7 +51,7 @@ const authController = {
 
             return res.json(newUser);
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
     },
@@ -115,22 +115,24 @@ const authController = {
 
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
-            res.cookie("access_token", accessToken, {
-                httpOnly: true,
-                sameSite: 'None',
-                secure: true
-            });
+            const cookieOptions = process.env.NODE_ENV === 'production' ?
+                {
+                    httpOnly: true,
+                    sameSite: 'None',
+                    secure: true
+                } :
+                {
+                    httpOnly: true
+                }
 
-            res.cookie("refresh_token", refreshToken, {
-                httpOnly: true,
-                sameSite: 'None',
-                secure: true
-            });
+            res.cookie("access_token", accessToken, cookieOptions);
+
+            res.cookie("refresh_token", refreshToken, cookieOptions);
 
             res.status(200).json(user)
 
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
     },
@@ -155,7 +157,7 @@ const authController = {
             res.status(200).json({ message: 'Logout succeed' });
 
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(400).json({ message });
         }
     }
