@@ -36,11 +36,15 @@ const verifyJWT = async (req, res, next) => {
             const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await authService.generateTokens({ id: decoded.id }, accessToken);
 
             res.cookie("access_token", newAccessToken, {
-                httpOnly: true
+                httpOnly: true,
+                sameSite: 'None',
+                secure: true
             });
 
             res.cookie("refresh_token", newRefreshToken, {
-                httpOnly: true
+                httpOnly: true,
+                sameSite: 'None',
+                secure: true
             });
 
             req.userId = decoded.id;

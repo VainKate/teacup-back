@@ -116,11 +116,15 @@ const authController = {
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
             res.cookie("access_token", accessToken, {
-                httpOnly: true
+                httpOnly: true,
+                sameSite: 'None',
+                secure: true
             });
 
             res.cookie("refresh_token", refreshToken, {
-                httpOnly: true
+                httpOnly: true,
+                sameSite: 'None',
+                secure: true
             });
 
             res.status(200).json(user)
