@@ -1,6 +1,7 @@
 const { User, Tag, Channel } = require("../models");
 const auth = require("../services/auth.service");
 
+const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10;
 
 const userController = {
@@ -58,10 +59,7 @@ const userController = {
         try {
 
             const user = await User.findByPk(id);
-
-            const isPasswordValid = user ?
-            await bcrypt.compare(newPassword, user.password) :
-            false;
+            const isPasswordValid = bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
             return res.status(409).json({ message : 'The current password is incorrect' });
@@ -72,7 +70,7 @@ const userController = {
         user.password = hashedPassword;
         await user.save();
 
-        auth.deleteAllRefreshToken(id);
+        await auth.deleteAllRefreshToken(id);
 
         return res.status(200).json(`Password updated`);
 

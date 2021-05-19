@@ -1,13 +1,13 @@
 ### PATCH /v1/me
 PATCH http://localhost:5435/v1/me
-access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTQzNDMwNywiZXhwIjoxNjIxNDM0MzY3fQ.h0j-jCOIitQvbotQ52TSlSIaq2qOdjJFFVscw_mom90
-refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTQzNDMwNywiZXhwIjoxNjIxNDM0NjA3fQ.r45TRyL4cvFPu4a3UWUFqmETly5lrm5p4TaMGwGv9cc
+access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTQ2NTU0MiwiZXhwIjoxNjIxNDY1NjAyfQ.-zDY_cRQEDfdxZZxAqKquqJWRuAZmx2OP6ZuWy21ip4
+refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTQ2NTU0MiwiZXhwIjoxNjIxNDY1ODQyfQ.DRk-goAyqrwcK3badbmfSUTq9OjKta-KF1adSbYKhtE
 Content-Type: application/json
 
 {
     "email" : "lulu@lulu.com",
     "password" : "lulu",
-    "newPassword" : "azerty",
+    "newPassword" : "lolo",
     "userId" : 53
 }
 
@@ -38,3 +38,12 @@ Content-Type: application/json
     "id" : 51
 }
 
+### GET /v1/signup (error, email missing)
+POST http://localhost:5435/v1/signup
+Content-Type: application/json
+
+{
+    "email" : "poussin@gmail.com",
+    "password" : "piou",
+    "nickname": "poussinpiou"
+}
