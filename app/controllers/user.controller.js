@@ -19,13 +19,13 @@ const userController = {
         try {
             const options = tags
                 ? {
-                    include: {
-                        association: "tags",
-                        through: {
-                            attributes: [],
-                        },
-                    },
-                }
+                      include: {
+                          association: "tags",
+                          through: {
+                              attributes: [],
+                          },
+                      },
+                  }
                 : null;
 
             const user = await User.findByPk(id, options);
@@ -43,39 +43,37 @@ const userController = {
             await user.reload();
 
             res.status(200).json(user);
-
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent.detail || error.message;
             res.status(500).json({ message });
         }
     },
 
     updatePassword: async (req, res) => {
         // on récupère l'ancien mot de passe dans req.body
-        const { password, newPassword } = req.body
-
+        const { password, newPassword } = req.body;
         const id = req.userId;
-        console.log(id);
-        try {
 
+        try {
             const user = await User.findByPk(id);
             const isPasswordValid = bcrypt.compare(password, user.password);
 
-        if (!isPasswordValid) {
-            return res.status(409).json({ message : 'The current password is incorrect' });
-        }
+            if (!isPasswordValid) {
+                return res
+                    .status(409)
+                    .json({ message: "The current password is incorrect" });
+            }
 
-        const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+            const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
-        user.password = hashedPassword;
-        await user.save();
+            user.password = hashedPassword;
+            await user.save();
 
-        await auth.deleteAllRefreshToken(id);
+            await auth.deleteAllRefreshToken(id);
 
-        return res.status(200).json(`Password updated`);
-
+            return res.status(200).json(`Password updated`);
         } catch (error) {
-            const message = error.parent?.detail || error.message
+            const message = error.parent?.detail || error.message;
             res.status(500).json({ message });
         }
     },
@@ -88,34 +86,38 @@ const userController = {
             const deleted = await User.destroy({ where: { id } });
 
             if (deleted === 0) {
-                return res.status(404).json({ message: 'This user does not exist or is already deleted' })
+                return res
+                    .status(404)
+                    .json({
+                        message:
+                            "This user does not exist or is already deleted",
+                    });
             }
 
             // send a 200 status and a message to show that user has been deleted
-            res.status(200).json({ message: `User account successfully deleted` });
-
+            res.status(200).json({
+                message: `User account successfully deleted`,
+            });
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent.detail || error.message;
             res.status(500).json({ message });
         }
     },
 
     profile: async (req, res) => {
         try {
-            const user = await User.findByPk(req.userId,
-                {
-                    include: {
-                        association: "tags",
-                        through: {
-                            attributes: []
-                        }
-                    }
-                });
+            const user = await User.findByPk(req.userId, {
+                include: {
+                    association: "tags",
+                    through: {
+                        attributes: [],
+                    },
+                },
+            });
 
             res.status(200).json(user);
-
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent.detail || error.message;
             res.status(500).json({ message });
         }
     },
@@ -129,34 +131,32 @@ const userController = {
                     {
                         association: "users",
                         through: {
-                            attributes: []
+                            attributes: [],
                         },
                         attributes: [],
                         where: {
-                            id
+                            id,
                         },
-                        required: true
+                        required: true,
                     },
                     {
                         association: "tags",
                         through: {
-                            attributes: []
+                            attributes: [],
                         },
-                    }
-                ]
+                    },
+                ],
             });
 
             res.status(200).json(channels);
-
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent.detail || error.message;
             res.status(500).json({ message });
         }
     },
 
     getRecommendedChannels: async (req, res) => {
         try {
-
             const recommendedChannels = await Channel.findAll({
                 include: {
                     association: "tags",
@@ -167,24 +167,22 @@ const userController = {
                         association: "users",
                         attributes: [],
                         through: {
-                            attributes: []
+                            attributes: [],
                         },
                         where: {
                             id: req.userId,
                         },
                     },
-                    required: true
+                    required: true,
                 },
             });
 
-
             res.status(200).json(recommendedChannels);
-
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent.detail || error.message;
             res.status(500).json({ message });
         }
-    }
+    },
 };
 
 module.exports = userController;
