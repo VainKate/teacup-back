@@ -52,6 +52,13 @@ const userController = {
     updatePassword: async (req, res) => {
         // on récupère l'ancien mot de passe dans req.body
         const { password, newPassword } = req.body;
+
+        if (!password || !newPassword) {
+            return res
+            .status(409)
+            .json({ message: 'Some informations are missing' });
+        }
+        
         const id = req.userId;
 
         try {
@@ -61,7 +68,7 @@ const userController = {
             if (!isPasswordValid) {
                 return res
                     .status(409)
-                    .json({ message: "The current password is incorrect" });
+                    .json({ message: 'The current password is incorrect' });
             }
 
             const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
@@ -71,7 +78,7 @@ const userController = {
 
             await auth.deleteAllRefreshToken(id);
 
-            return res.status(200).json(`Password updated`);
+            return res.status(200).json({message: 'Password updated'});
         } catch (error) {
             const message = error.parent?.detail || error.message;
             res.status(500).json({ message });

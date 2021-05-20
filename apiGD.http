@@ -1,13 +1,13 @@
 ### PATCH /v1/me
 PATCH http://localhost:5435/v1/me
-access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTQ2NTU0MiwiZXhwIjoxNjIxNDY1NjAyfQ.-zDY_cRQEDfdxZZxAqKquqJWRuAZmx2OP6ZuWy21ip4
-refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTQ2NTU0MiwiZXhwIjoxNjIxNDY1ODQyfQ.DRk-goAyqrwcK3badbmfSUTq9OjKta-KF1adSbYKhtE
+access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTQ5OTYzNCwiZXhwIjoxNjIxNDk5Njk0fQ.29nf9bF6MGwAAlAZqh_MxoJ-xLSEEIs222tB_jxXQnE
+refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTMsImlhdCI6MTYyMTQ5OTYzNCwiZXhwIjoxNjIxNDk5OTM0fQ.FBBnaCkIVdND9I-7VtyVRgKVYWFg5cBrmorami8seqg
 Content-Type: application/json
 
 {
     "email" : "lulu@lulu.com",
-    "password" : "lulu",
-    "newPassword" : "lolo",
+    "password" : "lolo",
+    "newPassword" : "lulu",
     "userId" : 53
 }
 
@@ -19,7 +19,7 @@ Content-Type: application/json
 
 {
     "email" : "lulu@lulu.com",
-    "password" : "lulu"
+    "password" : "lolo"
 }
 
 #------------------------------------------------
