@@ -1,5 +1,6 @@
 const { User, Tag, Channel } = require("../models");
-const { Op } = require('sequelize')
+const { Op } = require('sequelize');
+const sequelize = require('../database')
 
 const userController = {
     /**
@@ -123,47 +124,54 @@ const userController = {
 
     getRecommendedChannels: async (req, res) => {
         try {
+            console.log('>>>>>>>>>>>START')
 
             // const recommendedChannels = await Channel.findAll({
             //     include: [{
-            //         association: "tags",
-            //         through: {
-            //             attributes: [],
-            //         },
-            //         include: {
-            //             association: "users",
-            //             attributes: [],
-            //             through: {
-            //                 attributes: []
-            //             },
-            //             where: {
-            //                 id: req.userId,
-            //             },
-            //         },
-            //         required: true
-            //     },
-            //     {
-            //         association: "users",
-            //         through: {
-            //             attributes: []
-            //         },
-            //         where: {
-            //             [Op.not]: { 'user_id': req.userId }
-            //         }
+            //         association: "channelUsers",
+            //         attributes: [],
+                // }, {
+                //     association : "tags",
+                //     through : {
+                //         attributes : []
+                //     }
+                // }],
+            //     where: {
+            //         "$channelUsers.id$" : req.userId
             //     }
-            //     ]
-            // });
+            // })
+
             const recommendedChannels = await Channel.findAll({
-                include: {
-                    association : "users",
-                    attributes : [],
-                },
                 where : {
-                    id : {
-                        [Op.ne] : req.userId
+                    '$channelUsers.id$' : {
+                        [Op.ne]: 51
+                    },
+                    '$channelTags.tagUsers.id$' : req.userId
+                },
+                include: [{
+                    association: "channelTags",
+                    through: {
+                        attributes: [],
+                    },
+                    include: {
+                        association: "tagUsers",
+                        attributes: [],
+                        through: {
+                            attributes: []
+                        // },
+                        // where: {
+                        //     id: req.userId,
+                        }
                     }
-                }
-            })
+                },
+                {
+                    association: "channelUsers",
+                    through: {
+                        attributes: []
+                    },
+                    attributes : []
+                }]                
+            });
 
             res.status(200).json(recommendedChannels);
 

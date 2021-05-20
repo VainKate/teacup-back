@@ -10,14 +10,14 @@ const User = require('./user.model')(sequelize, Sequelize, Model);
 Channel.belongsToMany(User, {
     foreignKey: 'channel_id',
     otherKey: 'user_id',
-    as: 'users',
+    as: 'channelUsers',
     through: 'user_has_channel'
 });
 
 User.belongsToMany(Channel, {
     foreignKey: 'user_id',
     otherKey: 'channel_id',
-    as: 'channels',
+    as: 'userChannels',
     through: 'user_has_channel'
 });
 
@@ -26,14 +26,14 @@ User.belongsToMany(Channel, {
 User.belongsToMany(Tag, {
     foreignKey: 'user_id',
     otherKey: 'tag_id',
-    as: 'tags',
+    as: 'userTags',
     through: 'user_has_tag'
 });
 
 Tag.belongsToMany(User, {
     foreignKey: 'tag_id',
     otherKey: 'user_id',
-    as: 'users',
+    as: 'tagUsers',
     through: 'user_has_tag'
 });
 
@@ -42,14 +42,14 @@ Tag.belongsToMany(User, {
 Tag.belongsToMany(Channel, {
     foreignKey: 'tag_id',
     otherKey: 'channel_id',
-    as: 'channels',
+    as: 'tagChannels',
     through: 'channel_has_tag'
 });
 
 Channel.belongsToMany(Tag, {
     foreignKey: 'channel_id',
     otherKey: 'tag_id',
-    as: 'tags',
+    as: 'channelTags',
     through: 'channel_has_tag'
 });
 

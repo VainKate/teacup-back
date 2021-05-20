@@ -71,13 +71,13 @@ const authController = {
             const user = await User.scope('withPassword').findOne({
                 include: [
                     {
-                        association: "tags",
+                        association: "userTags",
                         through: {
                             attributes: [],
                         },
                     },
                     {
-                        association: "channels",
+                        association: "userChannels",
                         through: {
                             attributes: [],
                         },
@@ -101,12 +101,12 @@ const authController = {
 
             const recommendedChannels = await Channel.findAll({
                 include: {
-                    association: "tags",
+                    association: "channelTags",
                     through: {
                         attributes: [],
                     },
                     where: {
-                        id: user.tags.map(({ id }) => id),
+                        id: user.userTags.map(({ id }) => id),
                     },
                 },
             });
