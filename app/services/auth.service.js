@@ -21,7 +21,7 @@ const auth = {
             sameSite: 'None',
             secure: true,
             // expire: refreshTokenMaxAge,
-            domain : '.teacup-back.herokuapp.com'
+            // domain : '.teacup-back.herokuapp.com'
         } :
         {
             httpOnly: true,
