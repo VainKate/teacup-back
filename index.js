@@ -9,17 +9,19 @@ const cors = require('cors')
 
 const app = express();
 const corsOptions = {
-    origin: ['http://localhost:8080', 'http://teacup.quillers.fr'],
+    origin: process.env.NODE_ENV === 'production' ? 
+    /quillers.fr\/?$/ : 
+    'http://localhost:8080',
     credentials: true
 }
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
 const httpServer = createServer(app);
-const io = new Server(httpServer,
+const io = new Server(httpServer, 
     {
         cors: {
-            origin: ['http://localhost:8080', 'http://teacup.quillers.fr'],
+            origin: corsOptions.origin,
             allowedHeaders: [
                 'Access-Control-Allow-Headers',
                 'Origin',

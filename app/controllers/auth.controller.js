@@ -51,7 +51,7 @@ const authController = {
 
             return res.json(newUser);
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
     },
@@ -115,18 +115,15 @@ const authController = {
 
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
-            res.cookie("access_token", accessToken, {
-                httpOnly: true
-            });
+            res.cookie("access_token", accessToken, authService.cookieOptions);
 
-            res.cookie("refresh_token", refreshToken, {
-                httpOnly: true
-            });
+            res.cookie("refresh_token", refreshToken, authService.cookieOptions);
 
             res.status(200).json(user)
 
         } catch (error) {
-            const message = error.parent.detail || error.message
+            console.log(error)
+            const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
     },
@@ -145,13 +142,13 @@ const authController = {
 
             await authService.deleteRefreshToken(decoded.id, req.cookies.access_token);
 
-            res.clearCookie("access_token");
-            res.clearCookie("refresh_token");
+            res.clearCookie("access_token", authService.cookieOptions);
+            res.clearCookie("refresh_token", authService.cookieOptions);
 
             res.status(200).json({ message: 'Logout succeed' });
 
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(400).json({ message });
         }
     }
