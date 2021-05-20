@@ -20,11 +20,12 @@ const auth = {
             httpOnly: true,
             sameSite: 'None',
             secure: true,
-            expires: refreshTokenMaxAge
+            expire: refreshTokenMaxAge,
+            domain : '.quillers.fr'
         } :
         {
             httpOnly: true,
-            expires: refreshTokenMaxAge
+            expire: refreshTokenMaxAge
         },
 
     generateTokens: async (payload, previousAccessToken) => {

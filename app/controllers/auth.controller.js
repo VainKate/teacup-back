@@ -115,13 +115,14 @@ const authController = {
 
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
-            res.cookie("access_token", accessToken, auth.cookieOptions);
+            res.cookie("access_token", accessToken, authService.cookieOptions);
 
-            res.cookie("refresh_token", refreshToken, auth.cookieOptions);
+            res.cookie("refresh_token", refreshToken, authService.cookieOptions);
 
             res.status(200).json(user)
 
         } catch (error) {
+            console.log(error)
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
@@ -141,8 +142,12 @@ const authController = {
 
             await authService.deleteRefreshToken(decoded.id, req.cookies.access_token);
 
-            res.clearCookie("access_token");
-            res.clearCookie("refresh_token");
+            res.clearCookie("access_token", {
+                domain : '.quillers.fr'
+            });
+            res.clearCookie("refresh_token", {
+                domain : '.quillers.fr'
+            });
 
             res.status(200).json({ message: 'Logout succeed' });
 
