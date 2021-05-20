@@ -20,12 +20,12 @@ const auth = {
             httpOnly: true,
             sameSite: 'None',
             secure: true,
-            expire: refreshTokenMaxAge,
-            domain : 'teacup-back.herokuapp.com'
+            // expire: refreshTokenMaxAge,
+            domain : '.teacup-back.herokuapp.com'
         } :
         {
             httpOnly: true,
-            expire: refreshTokenMaxAge
+            // expire: refreshTokenMaxAge
         },
 
     generateTokens: async (payload, previousAccessToken) => {
