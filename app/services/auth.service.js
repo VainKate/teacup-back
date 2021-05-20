@@ -15,6 +15,18 @@ const jwtRefreshExpiration = process.env.NODE_ENV === 'production' ?
 const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
 const auth = {
+    cookieOptions: process.env.NODE_ENV === 'production' ?
+        {
+            httpOnly: true,
+            sameSite: 'None',
+            secure: true,
+            expires: refreshTokenMaxAge
+        } :
+        {
+            httpOnly: true,
+            expires: refreshTokenMaxAge
+        },
+
     generateTokens: async (payload, previousAccessToken) => {
         const accessToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration

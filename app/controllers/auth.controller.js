@@ -115,19 +115,9 @@ const authController = {
 
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
-            const cookieOptions = process.env.NODE_ENV === 'production' ?
-                {
-                    httpOnly: true,
-                    sameSite: 'None',
-                    secure: true
-                } :
-                {
-                    httpOnly: true
-                }
+            res.cookie("access_token", accessToken, auth.cookieOptions);
 
-            res.cookie("access_token", accessToken, cookieOptions);
-
-            res.cookie("refresh_token", refreshToken, cookieOptions);
+            res.cookie("refresh_token", refreshToken, auth.cookieOptions);
 
             res.status(200).json(user)
 
