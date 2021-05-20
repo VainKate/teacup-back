@@ -142,12 +142,8 @@ const authController = {
 
             await authService.deleteRefreshToken(decoded.id, req.cookies.access_token);
 
-            res.clearCookie("access_token", {
-                domain : authService.cookieOptions.domain
-            });
-            res.clearCookie("refresh_token", {
-                domain : authService.cookieOptions.domain
-            });
+            res.clearCookie("access_token", authService.cookieOptions);
+            res.clearCookie("refresh_token", authService.cookieOptions);
 
             res.status(200).json({ message: 'Logout succeed' });
 
