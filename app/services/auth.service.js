@@ -22,6 +22,7 @@ const auth = {
             secure: true,
             expire: refreshTokenMaxAge,
             // domain : /quillers.fr\/?$/
+            path: '/'
         } :
         {
             httpOnly: true,
