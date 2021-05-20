@@ -21,7 +21,7 @@ const auth = {
             sameSite: 'None',
             secure: true,
             expire: refreshTokenMaxAge,
-            domain : /quillers.fr\/?$/
+            // domain : /quillers.fr\/?$/
         } :
         {
             httpOnly: true,
