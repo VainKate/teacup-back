@@ -21,8 +21,7 @@ const auth = {
             sameSite: 'None',
             secure: true,
             expire: refreshTokenMaxAge,
-            // domain : /quillers.fr\/?$/
-            path: '/'
+            domain : 'teacup-back.herokuapp.com'
         } :
         {
             httpOnly: true,
