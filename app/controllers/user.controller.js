@@ -1,5 +1,5 @@
-const { User, Tag, Channel } = require("../models");
-const auth = require("../services/auth.service");
+const { User, Channel } = require("../models");
+const authService = require("../services/auth.service");
 
 const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10;
@@ -19,13 +19,13 @@ const userController = {
         try {
             const options = tags
                 ? {
-                      include: {
-                          association: "tags",
-                          through: {
-                              attributes: [],
-                          },
-                      },
-                  }
+                    include: {
+                        association: "tags",
+                        through: {
+                            attributes: [],
+                        },
+                    },
+                }
                 : null;
 
             const user = await User.findByPk(id, options);
@@ -55,15 +55,15 @@ const userController = {
 
         if (!password || !newPassword) {
             return res
-            .status(409)
-            .json({ message: 'Some informations are missing' });
+                .status(409)
+                .json({ message: 'Current or new password is missing.' });
         }
-        
+
         const id = req.userId;
 
         try {
-            const user = await User.findByPk(id);
-            const isPasswordValid = bcrypt.compare(password, user.password);
+            const user = await User.scope('withPassword').findByPk(id);
+            const isPasswordValid = await bcrypt.compare(password, user.password);
 
             if (!isPasswordValid) {
                 return res
@@ -76,9 +76,12 @@ const userController = {
             user.password = hashedPassword;
             await user.save();
 
-            await auth.deleteAllRefreshToken(id);
+            await authService.deleteAllRefreshToken(id);
 
-            return res.status(200).json({message: 'Password updated'});
+            res.clearCookie("access_token", authService.cookieOptions);
+            res.clearCookie("refresh_token", authService.cookieOptions);
+
+            return res.status(200).json({ message: 'Password updated' });
         } catch (error) {
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
