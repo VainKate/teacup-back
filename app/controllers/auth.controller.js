@@ -143,10 +143,10 @@ const authController = {
             await authService.deleteRefreshToken(decoded.id, req.cookies.access_token);
 
             res.clearCookie("access_token", {
-                domain : '.quillers.fr'
+                domain : authService.cookieOptions.domain
             });
             res.clearCookie("refresh_token", {
-                domain : '.quillers.fr'
+                domain : authService.cookieOptions.domain
             });
 
             res.status(200).json({ message: 'Logout succeed' });
