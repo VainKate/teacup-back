@@ -10,7 +10,7 @@ const cors = require('cors')
 const app = express();
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production' ?
-        [/.*?\.quillers\.fr\/?$/gm, /.*?\.ikodi\.eu\/?$/gm] :
+        [/\.quillers\.fr\/?$/, /\.ikodi\.eu\/?$/] :
         'http://localhost:8080',
     credentials: true
 }
