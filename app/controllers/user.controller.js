@@ -169,6 +169,9 @@ const userController = {
     getRecommendedChannels: async (req, res) => {
         try {
             console.log('>>>>>>>>>>>START')
+            const user = await User.findByPk(req.userId, {
+                include: ["userChannels", "userTags"]
+            })
 
             const recommendedChannels = await Channel.findAll({
                 attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('channelUsers')), "usersCount"]],
@@ -178,50 +181,63 @@ const userController = {
                         through: {
                             attributes: []
                         },
-                        attributes: [],
-                        group: ["channelUsers.id"]
+                        attributes: []
+                    },
+                    {
+                        association: "channelTags",
+                        through: {
+                            attributes: []
+                        }
                     }
                 ],
-                group: ["Channel.id"]
+                group: ["Channel.id", "channelTags.id"],
+                where: {
+                    id: {
+                        [Op.notIn]: user.userChannels.map(({ id }) => id)
+                    },
+                    // "channelTags" : {
+                    //     [Op.in]: user.userTags.map(({ id }) => id)
+                    // }
+                }
             })
 
-        // const recommendedChannels = await Channel.findAll({
-        //     include : [
-        //         {
-        //             association: "channelTags",
-        //             through : {
-        //                 attributes: []
-        //             },
-        //             include: {
-        //                 association: "tagUsers",
-        //                 through : {
-        //                     attributes: []
-        //                 },
-        //                 attributes: ["id"],
-        //                 required: true
-        //             }
-        //         },
-        //         {
-        //             association : 'channelUsers',
-        //             through : {
-        //                 attributes: []
-        //             },
-        //             attributes: ['id', [sequelize.fn('count', sequelize.col("channelUsers.id")), 'count']],
-        //             group: ['Channel.id']
-        //         }
-        //     ],
-        //     where : {
-        //         "$channelTags->tagUsers.id$" : req.userId
-        //     }
-        // })
+            // const recommendedChannels = await Channel.findAll({
+            //     include : [
+            //         {
+            //             association: "channelTags",
+            //             through : {
+            //                 attributes: []
+            //             },
+            //             include: {
+            //                 association: "tagUsers",
+            //                 through : {
+            //                     attributes: []
+            //                 },
+            //                 attributes: ["id"],
+            //                 required: true
+            //             }
+            //         },
+            //         {
+            //             association : 'channelUsers',
+            //             through : {
+            //                 attributes: []
+            //             },
+            //             attributes: ['id', [sequelize.fn('count', sequelize.col("channelUsers.id")), 'count']],
+            //             group: ['Channel.id']
+            //         }
+            //     ],
+            //     where : {
+            //         "$channelTags->tagUsers.id$" : req.userId
+            //     }
+            // })
 
-        res.status(200).json(recommendedChannels);
-    } catch(error) {
-        console.error(error)
-        const message = error.parent?.detail || error.message
-        res.status(500).json({ message });
-    }
-},
+            res.status(200).json(recommendedChannels);
+        } catch (error) {
+            console.error(error)
+            const message = error.parent?.detail || error.message
+            res.status(500).json({ message });
+        }
+    },
 };
 
 module.exports = userController;
