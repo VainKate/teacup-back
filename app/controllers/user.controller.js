@@ -168,68 +168,53 @@ const userController = {
 
     getRecommendedChannels: async (req, res) => {
         try {
-            console.log('>>>>>>>>>>>START')
             const user = await User.findByPk(req.userId, {
-                include: ["userChannels", "userTags"]
+                attributes: ["id"],
+                include: [{
+                    association: "channels",
+                    through: {
+                        attributes: []
+                    },
+                    attributes: ['id']
+                }, {
+                    association: "tags",
+                    through: {
+                        attributes: []
+                    },
+                    attributes: ['id']
+                }]
             })
 
             const recommendedChannels = await Channel.findAll({
-                attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('channelUsers')), "usersCount"]],
+                attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('users')), "usersCount"]],
                 include: [
                     {
-                        association: "channelUsers",
+                        association: "users",
                         through: {
                             attributes: []
                         },
                         attributes: []
                     },
                     {
-                        association: "channelTags",
+                        association: "tags",
                         through: {
                             attributes: []
-                        }
+                        },
+                        attributes: ["id", "name"]
                     }
                 ],
-                group: ["Channel.id", "channelTags.id"],
+                group: ["Channel.id", "tags.id"],
                 where: {
                     id: {
-                        [Op.notIn]: user.userChannels.map(({ id }) => id)
-                    },
-                    // "channelTags" : {
-                    //     [Op.in]: user.userTags.map(({ id }) => id)
-                    // }
+                        [Op.and]: [{
+                            [Op.notIn]: user.channels.map(({ id }) => id)
+                        }, {
+                            [Op.in]: Sequelize.literal(
+                                `(SELECT channel_id FROM channel_has_tag WHERE tag_id in (${user.tags.map(({ id }) => id)}))`)
+                        }]
+                    }
                 }
-            })
-
-            // const recommendedChannels = await Channel.findAll({
-            //     include : [
-            //         {
-            //             association: "channelTags",
-            //             through : {
-            //                 attributes: []
-            //             },
-            //             include: {
-            //                 association: "tagUsers",
-            //                 through : {
-            //                     attributes: []
-            //                 },
-            //                 attributes: ["id"],
-            //                 required: true
-            //             }
-            //         },
-            //         {
-            //             association : 'channelUsers',
-            //             through : {
-            //                 attributes: []
-            //             },
-            //             attributes: ['id', [sequelize.fn('count', sequelize.col("channelUsers.id")), 'count']],
-            //             group: ['Channel.id']
-            //         }
-            //     ],
-            //     where : {
-            //         "$channelTags->tagUsers.id$" : req.userId
-            //     }
-            // })
+            });
 
             res.status(200).json(recommendedChannels);
         } catch (error) {
