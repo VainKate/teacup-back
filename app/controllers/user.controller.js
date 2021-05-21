@@ -134,8 +134,6 @@ const userController = {
     },
 
     getUserChannels: async (req, res) => {
-        const id = req.userId;
-
         try {
             const channels = await Channel.findAll({
                 attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('users')), "usersCount"]],

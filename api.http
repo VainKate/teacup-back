@@ -68,6 +68,11 @@ GET http://localhost:8000/v1/tags
 
 #------------------------------------------------
 
+### GET /v1/channels (success)
+GET http://localhost:8000/v1/channels
+
+#------------------------------------------------
+
 ### GET /v1/signup (success)
 POST http://localhost:8000/v1/signup
 Content-Type: application/json
