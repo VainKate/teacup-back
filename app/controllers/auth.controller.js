@@ -115,23 +115,14 @@ const authController = {
 
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
-            const cookieOptions = process.env.NODE_ENV === 'production' ?
-                {
-                    httpOnly: true,
-                    sameSite: 'None',
-                    secure: true
-                } :
-                {
-                    httpOnly: true
-                }
+            res.cookie("access_token", accessToken, authService.cookieOptions);
 
-            res.cookie("access_token", accessToken, cookieOptions);
-
-            res.cookie("refresh_token", refreshToken, cookieOptions);
+            res.cookie("refresh_token", refreshToken, authService.cookieOptions);
 
             res.status(200).json(user)
 
         } catch (error) {
+            console.log(error)
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
@@ -151,8 +142,8 @@ const authController = {
 
             await authService.deleteRefreshToken(decoded.id, req.cookies.access_token);
 
-            res.clearCookie("access_token");
-            res.clearCookie("refresh_token");
+            res.clearCookie("access_token", authService.cookieOptions);
+            res.clearCookie("refresh_token", authService.cookieOptions);
 
             res.status(200).json({ message: 'Logout succeed' });
 

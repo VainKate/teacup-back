@@ -15,6 +15,17 @@ const jwtRefreshExpiration = process.env.NODE_ENV === 'production' ?
 const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
 const auth = {
+    cookieOptions: process.env.NODE_ENV === 'production' ?
+        {
+            httpOnly: true,
+            sameSite: 'None',
+            secure: true,
+            domain : '.teacup-back.herokuapp.com'
+        } :
+        {
+            httpOnly: true,
+        },
+
     generateTokens: async (payload, previousAccessToken) => {
         const accessToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration

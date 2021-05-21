@@ -14,11 +14,10 @@ Content-Type: application/json
 GET http://localhost:8000/v1/me/recommended
 Content-Type: application/json
 
-
 #------------------------------------------------
 
-### PUT /v1/user/:id (success) update all
-PUT http://localhost:8000/v1/me
+### PATCH /v1/me (success) update all
+PATCH http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
@@ -28,8 +27,8 @@ Content-Type: application/json
 
 }
 
-### PUT /v1/user/:id (success) update just tags
-PUT http://localhost:8000/v1/users/51
+### PATCH /v1/me (success) update just tags
+PATCH http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
@@ -37,36 +36,57 @@ Content-Type: application/json
 
 }
 
-### PUT /v1/user/:id (success) update just email
-PUT http://localhost:8000/v1/users/51
+### PATCH /v1/me (success) update just email
+PATCH http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
     "email" : "supahaka@testmail.com"
 }
 
-### PUT /v1/user/:id (email already exist) 
-PUT http://localhost:8000/v1/users/1
+### PATCH /v1/me (email already exist) // email has to be changed
+PATCH http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
     "email" : "supahaka@testmail.com"
-}
-
-### PUT /v1/user/:id (user account does not exist) 
-PUT http://localhost:8000/v1/users/52
-Content-Type: application/json
-
-{
-    "email" : "supahakaTHETHIRD@testmail.com"
 }
 
 #------------------------------------------------
 
-### DELETE /v1/user/:id (success)
-DELETE http://localhost:8000/v1/users/47
+### PATCH /v1/me (success)
+PATCH http://localhost:8000/v1/me
 Content-Type: application/json
 
-### DELETE /v1/user/:id (deletion of inexistant user)
-DELETE http://localhost:8000/v1/users/53
+{
+    "password" : "test",
+    "newPassword" : "test"
+
+}
+
+### PATCH /v1/me (missing old password)
+PATCH http://localhost:8000/v1/me
+Content-Type: application/json
+
+{
+    "newPassword" : "supahaka@testmail.com"
+}
+
+### PATCH /v1/me (old password incorrect)
+PATCH http://localhost:8000/v1/me
+Content-Type: application/json
+
+{
+    "password" : "supahaka@testmail.com",
+    "newPassword" : "test"
+}
+
+#------------------------------------------------
+
+### DELETE /v1/me (success)
+DELETE http://localhost:8000/v1/me
+Content-Type: application/json
+
+### DELETE /v1/me (deletion of inexistant user)
+DELETE http://localhost:8000/v1/me
 Content-Type: application/json
