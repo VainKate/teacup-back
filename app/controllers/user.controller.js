@@ -138,25 +138,29 @@ const userController = {
 
         try {
             const channels = await Channel.findAll({
+                attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('users')), "usersCount"]],
+                group: ["Channel.id", "tags.id"],
                 include: [
                     {
                         association: "users",
                         through: {
                             attributes: [],
                         },
-                        attributes: [],
-                        where: {
-                            id,
-                        },
-                        required: true,
+                        attributes: []
                     },
                     {
                         association: "tags",
                         through: {
                             attributes: [],
                         },
-                    },
+                        attributes: ['id', 'name']
+                    }
                 ],
+                where: {
+                    id: {
+                        [Op.in]: Sequelize.literal(`(SELECT channel_id FROM user_has_channel WHERE user_id = ${req.userId})`)
+                    }
+                }
             });
 
             res.status(200).json(channels);
