@@ -10,6 +10,20 @@ Content-Type: application/json
 
 #------------------------------------------------
 
+### DELETE /v1/me/channels/:id
+DELETE http://localhost:8000/v1/me/channels/11
+Content-Type: application/json
+
+### DELETE /v1/me/channels/:id
+DELETE http://localhost:8000/v1/me/channels/10
+Content-Type: application/json
+
+### DELETE /v1/me/channels/:id
+DELETE http://localhost:8000/v1/me/channels/1000
+Content-Type: application/json
+
+#------------------------------------------------
+
 ### GET /v1/me/recommended 
 GET http://localhost:8000/v1/me/recommended
 Content-Type: application/json

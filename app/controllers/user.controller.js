@@ -166,6 +166,23 @@ const userController = {
         }
     },
 
+    removeJoinedChannel: async (req, res) => {
+        try {
+            const channel = await Channel.findByPk(req.params.id);
+
+            if (!channel) {
+                return res.status(404).json({ message: `Channel not found` })
+            };
+
+            await channel.removeUser(req.userId);
+
+            res.status(200).json({ message: 'Channel removed successfully' });
+        } catch (error) {
+            const message = error.parent?.detail || error.message
+            res.status(500).json({ message });
+        }
+    },
+
     getRecommendedChannels: async (req, res) => {
         try {
             const user = await User.findByPk(req.userId, {
