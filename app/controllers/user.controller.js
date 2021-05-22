@@ -235,6 +235,16 @@ const userController = {
                 }) :
                 []
 
+                console.log(user.tags)
+
+                if (recommendedChannels.length){
+                    for(const channel of recommendedChannels){
+                        for(const tag of channel.tags){
+                            tag.matchingTag = user.tags.find( userTag => userTag.dataValues.id === tag.id) ? true : false;
+                        }
+                    }
+                }
+
             res.status(200).json(recommendedChannels);
         } catch (error) {
             console.error(error)
