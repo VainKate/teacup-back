@@ -53,7 +53,8 @@ const channelController = {
                         },
                         attributes: []
                     }
-                ]
+                ],
+                order : Sequelize.literal('"usersCount" DESC')
             });
 
             return res.json(channels);
