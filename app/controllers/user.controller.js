@@ -168,6 +168,23 @@ const userController = {
         }
     },
 
+    removeJoinedChannel: async (req, res) => {
+        try {
+            const channel = await Channel.findByPk(req.params.id);
+
+            if (!channel) {
+                return res.status(404).json({ message: `Channel not found` })
+            };
+
+            await channel.removeUser(req.userId);
+
+            res.status(200).json({ message: 'Channel removed successfully' });
+        } catch (error) {
+            const message = error.parent?.detail || error.message
+            res.status(500).json({ message });
+        }
+    },
+
     getRecommendedChannels: async (req, res) => {
         try {
             const user = await User.findByPk(req.userId, {
@@ -185,38 +202,52 @@ const userController = {
                     },
                     attributes: ['id']
                 }]
-            })
-
-            const recommendedChannels = await Channel.findAll({
-                attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('users')), "usersCount"]],
-                include: [
-                    {
-                        association: "users",
-                        through: {
-                            attributes: []
-                        },
-                        attributes: []
-                    },
-                    {
-                        association: "tags",
-                        through: {
-                            attributes: []
-                        },
-                        attributes: ["id", "name"]
-                    }
-                ],
-                group: ["Channel.id", "tags.id"],
-                where: {
-                    id: {
-                        [Op.and]: [{
-                            [Op.notIn]: user.channels.map(({ id }) => id)
-                        }, {
-                            [Op.in]: Sequelize.literal(
-                                `(SELECT channel_id FROM channel_has_tag WHERE tag_id in (${user.tags.map(({ id }) => id)}))`)
-                        }]
-                    }
-                }
             });
+
+            const recommendedChannels = user.tags.length ?
+                await Channel.findAll({
+                    attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('users')), "usersCount"]],
+                    include: [
+                        {
+                            association: "users",
+                            through: {
+                                attributes: []
+                            },
+                            attributes: []
+                        },
+                        {
+                            association: "tags",
+                            through: {
+                                attributes: []
+                            },
+                            attributes: ["id", "name"]
+                        }
+                    ],
+                    group: ["Channel.id", "tags.id"],
+                    where: {
+                        id: {
+                            [Op.and]: [{
+                                [Op.notIn]: user.channels.map(({ id }) => id)
+                            }, {
+                                [Op.in]: Sequelize.literal(
+                                    `(SELECT channel_id FROM channel_has_tag WHERE tag_id in (${user.tags.map(({ id }) => id)}))`)
+                            }]
+                        }
+                    }
+                }) :
+                [];
+
+            if (recommendedChannels.length) {
+                for (const channel of recommendedChannels) {
+                    for (const tag of channel.tags) {
+                        tag.matchingTag = user.tags.find(userTag => userTag.dataValues.id === tag.id) ? true : false;
+                    }
+                };
+
+                recommendedChannels.sort((a, b) => {
+                    return b.tags.filter(tag => tag.matchingTag).length - a.tags.filter(tag => tag.matchingTag).length
+                })
+            }
 
             res.status(200).json(recommendedChannels);
         } catch (error) {
