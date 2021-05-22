@@ -233,14 +233,18 @@ const userController = {
                         }
                     }
                 }) :
-                []
+                [];
 
             if (recommendedChannels.length) {
                 for (const channel of recommendedChannels) {
                     for (const tag of channel.tags) {
                         tag.matchingTag = user.tags.find(userTag => userTag.dataValues.id === tag.id) ? true : false;
                     }
-                }
+                };
+
+                recommendedChannels.sort((a, b) => {
+                    return b.tags.filter(tag => tag.matchingTag).length - a.tags.filter(tag => tag.matchingTag).length
+                })
             }
 
             res.status(200).json(recommendedChannels);

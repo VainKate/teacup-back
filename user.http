@@ -46,7 +46,7 @@ PUT http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
-    "tags" : [1, 10, 11, 14, 18]
+    "tags" : [1, 10, 11, 14, 18, 8, 23, 24]
 
 }
 
