@@ -31,35 +31,35 @@ Content-Type: application/json
 #------------------------------------------------
 
 ### PATCH /v1/me (success) update all
-PATCH http://localhost:8000/v1/me
+PUT http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
     "email" : "supahaka@testmail.com",
     "nickname" : "SUPAHAKA2",
-    "tags" : [1, 10, 11, 12, 14, 18, 19]
+    "tags" : []
 
 }
 
-### PATCH /v1/me (success) update just tags
-PATCH http://localhost:8000/v1/me
+### PUT /v1/me (success) update just tags
+PUT http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
-    "tags" : [1, 10, 11, 14, 18]
+    "tags" : [1, 10, 11, 14, 18, 8, 23, 24]
 
 }
 
-### PATCH /v1/me (success) update just email
-PATCH http://localhost:8000/v1/me
+### PUT /v1/me (success) update just email
+PUT http://localhost:8000/v1/me
 Content-Type: application/json
 
 {
     "email" : "supahaka@testmail.com"
 }
 
-### PATCH /v1/me (email already exist) // email has to be changed
-PATCH http://localhost:8000/v1/me
+### PUT /v1/me (email already exist) // email has to be changed
+PUT http://localhost:8000/v1/me
 Content-Type: application/json
 
 {

@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes, Model) => {
             unique: true,
             allowNull: false
         },
-        
+        matchingTag : DataTypes.VIRTUAL
     }, {
         sequelize,
         modelName: 'Tag',
