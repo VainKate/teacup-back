@@ -233,9 +233,31 @@ const userController = {
                         }
                     }
                 }) :
-                [];
+                await Channel.findAll({
+                    attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('users')), "usersCount"]],
+                    group: ["Channel.id", "tags.id"],
+                    include: [
+                        {
+                            association: 'tags',
+                            attributes: ['id', 'name'],
+                            through: {
+                                attributes: []
+                            }
+                        },
+                        {
+                            association: "users",
+                            through: {
+                                attributes: [],
+                            },
+                            attributes: []
+                        }
+                    ],
+                    order : Sequelize.literal('"usersCount" DESC'),
+                    limit: 15,
+                    subQuery: false
+                });
 
-            if (recommendedChannels.length) {
+            if (user.tags.length) {
                 for (const channel of recommendedChannels) {
                     for (const tag of channel.tags) {
                         tag.matchingTag = user.tags.find(userTag => userTag.dataValues.id === tag.id) ? true : false;
