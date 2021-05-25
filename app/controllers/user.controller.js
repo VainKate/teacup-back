@@ -204,8 +204,10 @@ const userController = {
                 }]
             });
 
-            const recommendedChannels = user.tags.length ?
-                await Channel.findAll({
+            let recommendedChannels;
+
+            if (user.tags.length) {
+                recommendedChannels = await Channel.findAll({
                     attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('users')), "usersCount"]],
                     include: [
                         {
@@ -234,8 +236,19 @@ const userController = {
                             }]
                         }
                     }
-                }) :
-                await Channel.findAll({
+                });
+
+                for (const channel of recommendedChannels) {
+                    for (const tag of channel.tags) {
+                        tag.matchingTag = user.tags.find(userTag => userTag.dataValues.id === tag.id) ? true : false;
+                    }
+                };
+
+                recommendedChannels.sort((a, b) => {
+                    return b.tags.filter(tag => tag.matchingTag).length - a.tags.filter(tag => tag.matchingTag).length
+                })
+            } else {
+                const channels = await Channel.findAll({
                     attributes: ["id", "title", [Sequelize.fn("COUNT", Sequelize.col('users')), "usersCount"]],
                     group: ["Channel.id", "tags.id"],
                     include: [
@@ -254,21 +267,10 @@ const userController = {
                             attributes: []
                         }
                     ],
-                    order : Sequelize.literal('"usersCount" DESC'),
-                    limit: 15,
-                    subQuery: false
+                    order: Sequelize.literal('"usersCount" DESC')
                 });
 
-            if (user.tags.length) {
-                for (const channel of recommendedChannels) {
-                    for (const tag of channel.tags) {
-                        tag.matchingTag = user.tags.find(userTag => userTag.dataValues.id === tag.id) ? true : false;
-                    }
-                };
-
-                recommendedChannels.sort((a, b) => {
-                    return b.tags.filter(tag => tag.matchingTag).length - a.tags.filter(tag => tag.matchingTag).length
-                })
+                recommendedChannels = channels.slice(0, 15);
             }
 
             res.status(200).json(recommendedChannels);
