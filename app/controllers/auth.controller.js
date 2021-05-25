@@ -72,6 +72,9 @@ const authController = {
             const success = user ? true : false;
 
             await mailerService.sendResetPassword(email, success);
+            const { resetToken } = await authService.generateResetToken({ email }, success);
+
+            res.cookie("reset_token", resetToken, authService.cookieOptions);
 
             res.status(200).json({
                 message: `An email has been sent to ${email} with further instructions.`
