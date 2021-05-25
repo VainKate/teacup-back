@@ -8,7 +8,7 @@ const tagController = {
             res.json(tags)
 
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
     },
@@ -27,7 +27,7 @@ const tagController = {
             res.json(tags)
 
         } catch (error) {
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
     }
