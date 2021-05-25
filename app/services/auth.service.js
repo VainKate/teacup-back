@@ -55,7 +55,7 @@ const auth = {
             }))
     },
 
-    generateResetToken: async (payload) => {
+    generateResetToken: async (payload, success) => {
         const resetToken = await jwt.sign(payload, JWT_SECRET, {
             expiresIn: resetTokenExpiration
         });

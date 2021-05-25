@@ -25,8 +25,9 @@ const mailerService = {
     sendResetPassword: async (email, success) => {
         try {
             const html = new Email();
-            const signupLink = 'http://teacup.quillers.fr';
-            const resetLink = 'http://teacup.quillers.fr';
+            const signupLink = 'https://teacup.quillers.fr';
+            const resetLink = ' http://localhost:8080/newpassword.html';
+            // const resetLink = ' https://teacup.quillers.fr/newpassword.html';
 
             const emailTemplate = await html.render('forgotPwd', {
                 success,
@@ -51,7 +52,7 @@ const mailerService = {
         } catch (error) {
             console.error(error);
 
-            const message = error.parent.detail || error.message
+            const message = error.parent?.detail || error.message
             res.status(400).json({ message });
         }
     }
