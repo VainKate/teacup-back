@@ -86,6 +86,49 @@ const authController = {
         }
     },
 
+    resetPwd: async (req, res) => {
+        const resetToken = req.cookies.access_token || null;
+        const { password } = req.body;
+
+        try {
+            if (!resetToken) {
+                throw new Error('No reset token found');
+            }
+
+            if (!password) {
+                throw new Error('New password must be provided');
+            }
+
+            const decoded = await jwt.verify(resetToken, JWT_SECRET);
+
+            const { resetToken: redisToken } = await authService.getResetToken(decoded.email, resetToken);
+
+            if (resetToken !== redisToken) {
+                throw new Error('Reset token is invalid');
+            };
+
+            const user = User.findOne({ email: decoded.email });
+
+            if (!user) {
+                throw new Error('This account does not exist anymore.')
+            }
+
+            user.password = await bcrypt.hash(password, SALT_ROUNDS)
+
+            await user.save();
+
+            res.clearCookie("reset_token", authService.cookieOptions);
+
+        } catch (error) {
+            res.status(403).json(error.name !== 'Error' ?
+                error :
+                {
+                    "message": error.message
+                })
+        }
+
+    },
+
     login: async (req, res) => {
         try {
             const { email, password } = req.body;
@@ -166,7 +209,7 @@ const authController = {
                 })
             }
 
-            const decoded = jwt.verify(req.cookies.access_token, JWT_SECRET, {
+            const decoded = await jwt.verify(req.cookies.access_token, JWT_SECRET, {
                 ignoreExpiration: true
             })
 

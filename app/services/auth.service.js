@@ -30,10 +30,10 @@ const auth = {
         },
 
     generateTokens: async (payload, previousAccessToken) => {
-        const accessToken = jwt.sign(payload, JWT_SECRET, {
+        const accessToken = await jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration
         });
-        const refreshToken = jwt.sign(payload, JWT_SECRET, {
+        const refreshToken = await jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtRefreshExpiration
         });
 
@@ -56,7 +56,7 @@ const auth = {
     },
 
     generateResetToken: async (payload) => {
-        const resetToken = jwt.sign(payload, JWT_SECRET, {
+        const resetToken = await jwt.sign(payload, JWT_SECRET, {
             expiresIn: resetTokenExpiration
         });
 
