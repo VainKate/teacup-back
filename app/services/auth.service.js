@@ -14,23 +14,26 @@ const jwtRefreshExpiration = process.env.NODE_ENV === 'production' ?
     60 * 60 * 24 * 30 : 60 * 5;
 const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
+const resetTokenExpiration = process.env.NODE_ENV === 'production' ?
+    60 * 60 * 24 : 60;
+
 const auth = {
     cookieOptions: process.env.NODE_ENV === 'production' ?
         {
             httpOnly: true,
             sameSite: 'None',
             secure: true,
-            domain : '.teacup-back.herokuapp.com'
+            domain: '.teacup-back.herokuapp.com'
         } :
         {
             httpOnly: true,
         },
 
     generateTokens: async (payload, previousAccessToken) => {
-        const accessToken = jwt.sign(payload, JWT_SECRET, {
+        const accessToken = await jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration
         });
-        const refreshToken = jwt.sign(payload, JWT_SECRET, {
+        const refreshToken = await jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtRefreshExpiration
         });
 
@@ -50,6 +53,23 @@ const auth = {
                 refreshToken,
                 expires: refreshTokenMaxAge
             }))
+    },
+
+    generateResetToken: async (payload, success) => {
+        const resetToken = await jwt.sign(payload, JWT_SECRET, {
+            expiresIn: resetTokenExpiration
+        });
+
+        if (success) {
+            await asyncClient.setex(`${PREFIX}resetPasswordToken-email${payload.email}`,
+                jwtRefreshExpiration,
+                JSON.stringify({
+                    resetToken,
+                    expires: new Date() + resetTokenExpiration
+                }))
+        };
+
+        return { resetToken }
     },
 
     getRefreshToken: async (userId, accessToken) => {

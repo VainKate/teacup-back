@@ -25,7 +25,7 @@ const verifyJWT = async (req, res, next) => {
             };
 
 
-            const decoded = jwt.verify(refreshToken, JWT_SECRET)
+            const decoded = await jwt.verify(refreshToken, JWT_SECRET)
 
             const { refreshToken: redisToken } = await authService.getRefreshToken(decoded.id, accessToken);
 
