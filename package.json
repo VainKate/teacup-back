@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate-db": "node ./data/db-generate.js",
-    "start": "node index.js",
+    "start": "node ./data/db-generate.js && node index.js",
     "start-new-db": "node ./data/db-generate.js && node index.js",
     "dev": "node index.js"
   },
