@@ -1,24 +1,3 @@
-# version: '3.1'
-
-# services:
-
-#     db:
-#       image: postgres
-#       restart: always
-#       environment:
-#         - POSTGRES_PASSWORD: postgres
-#     ports:
-#         - '5438:5432'
-#     volumes: 
-#         # - ./postgres-data:/var/lib/postgresql/data
-#         - teacup-data:/data/teacup/db
-
-#     redis:
-#         image: redis
-#         container_name: needle_redis
-#         ports:
-#         - '6379:6379'
-
 version: '3.8'
 
 services:

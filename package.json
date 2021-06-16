@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-db": "node ./data/db-generate.js",
-    "start": "node ./data/db-generate.js && node index.js",
-    "start-new-db": "node ./data/db-generate.js && node index.js",
-    "dev": "node index.js"
+    "setup": "docker-compose up -d && sleep 3",
+    "start": "npm run setup && nodemon",
+    "new": "npm run setup && docker exec -it teacup_postgres createdb teacup -U postgres && node ./data/db-generate.js && nodemon",
+    "stop": "docker-compose stop"
   },
   "author": "VainKate & guillaume67450",
   "license": "ISC",
