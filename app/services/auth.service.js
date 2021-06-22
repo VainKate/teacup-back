@@ -20,7 +20,7 @@ const auth = {
             httpOnly: true,
             sameSite: 'None',
             secure: true,
-            domain : '.teacup-back.herokuapp.com'
+            domain: 'teacup.minervas.space'
         } :
         {
             httpOnly: true,
