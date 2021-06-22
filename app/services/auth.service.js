@@ -18,9 +18,8 @@ const auth = {
     cookieOptions: process.env.NODE_ENV === 'production' ?
         {
             httpOnly: true,
-            sameSite: 'None',
             secure: true,
-            domain: 'teacup.minervas.space'
+            domain: 'api.teacup.minervas.space'
         } :
         {
             httpOnly: true,
