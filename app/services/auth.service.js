@@ -19,7 +19,7 @@ const auth = {
         {
             httpOnly: true,
             secure: true,
-            domain: '.teacup.minervas.space'
+            domain: 'api.teacup.minervas.space'
         } :
         {
             httpOnly: true,
