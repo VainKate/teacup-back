@@ -15,9 +15,8 @@ const corsOptions = {
         [/localhost/],
     credentials: true
 }
-app.use(cors(corsOptions));
-app.use(cookieParser());
-app.use(compression());
+
+app.use([cors(corsOptions), cookieParser(), compression(), express.json()])
 
 const httpServer = createServer(app);
 const io = new Server(httpServer,
@@ -40,8 +39,6 @@ const socketHandler = require('./app/services/socket.handler');
 
 const PORT = process.env.PORT || 8000;
 
-
-app.use(express.json());
 app.use('/v1', apiRouter);
 
 io.on('connection', socket => {
