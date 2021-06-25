@@ -4,7 +4,7 @@
     "description": "teacup backend",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jest",
         "setup": "docker-compose up -d && sleep 3",
         "start": "yarn setup && npx nodemon",
         "new": "yarn run setup && docker exec -it teacup_postgres createdb teacup -U postgres && node ./data/db-generate.js && npx nodemon",
