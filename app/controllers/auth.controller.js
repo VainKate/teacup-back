@@ -9,12 +9,6 @@ const JWT_SECRET = process.env.JWT_SECRET
 
 
 const authController = {
-    /**
-     *
-     * @param {string} req.body
-     * @param {*} res
-     * @returns
-     */
     signup: async (req, res) => {
         try {
             const { email, nickname, password } = req.body;
@@ -44,7 +38,7 @@ const authController = {
             const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
             const newUser = await User.create({
-                email,
+                email: email.toLowerCase(),
                 password: hashedPassword,
                 nickname,
             });
@@ -85,7 +79,7 @@ const authController = {
                 ],
 
                 where: {
-                    email,
+                    email: email.toLowerCase(),
                 },
             });
 
