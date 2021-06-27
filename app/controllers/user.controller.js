@@ -105,6 +105,12 @@ const userController = {
                     });
             }
 
+            await authService.deleteAllRefreshToken(id);
+
+            res.clearCookie("access_token", authService.cookieOptions);
+            res.clearCookie("refresh_token", authService.cookieOptions);
+
+
             // send a 200 status and a message to show that user has been deleted
             res.status(200).json({
                 message: `User account successfully deleted`,

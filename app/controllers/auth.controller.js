@@ -94,8 +94,9 @@ const authController = {
                 false;
 
             if (!isPasswordValid) {
+                // if there is no user with this email address or if the provided password is incorrect, the same error is returned
                 return res.status(401).json({
-                    messsage: `Your credentials are invalid.`
+                    message: `Your credentials are invalid.`
                 });
             }
 
@@ -113,12 +114,14 @@ const authController = {
 
             user.recommendedChannels = recommendedChannels;
 
+            // if the login succeed, access & refresh tokens are generated ...
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
+            // and stored in httpOnly cookies.
             res.cookie("access_token", accessToken, authService.cookieOptions);
-
             res.cookie("refresh_token", refreshToken, authService.cookieOptions);
 
+            // finally, the user's data are sent without his password
             res.status(200).json(user)
 
         } catch (error) {

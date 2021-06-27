@@ -26,6 +26,7 @@ const auth = {
         },
 
     generateTokens: async (payload, previousAccessToken) => {
+        // generate both access & refresh token, sign them with JWT_SECRET and set an expiration value in seconds
         const accessToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration
         });
@@ -33,16 +34,19 @@ const auth = {
             expiresIn: jwtRefreshExpiration
         });
 
+        // save the refresh token in redis
         await auth.saveRefreshToken(payload.id, accessToken, refreshToken, previousAccessToken);
 
         return { accessToken, refreshToken }
     },
 
     saveRefreshToken: async (userId, accessToken, refreshToken, previousAccessToken) => {
+        // if a refresh token already exists, delete it to replace it by the new one
         if (previousAccessToken) {
             await asyncClient.del(`${PREFIX}refreshToken-user${userId}-${previousAccessToken}`);
         };
 
+        // save the new refresh token in redis with an expiration value in timestamp
         await asyncClient.setex(`${PREFIX}refreshToken-user${userId}-${accessToken}`,
             jwtRefreshExpiration,
             JSON.stringify({
@@ -67,6 +71,7 @@ const auth = {
 
     deleteAllRefreshToken: async (userId) => {
         let cursor;
+        let keys;
         const pattern = `${PREFIX}refreshToken-user${userId}-*`
 
         do {
