@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
-const { User, Channel } = require("../models");
+const { User } = require("../models");
 const authService = require('../services/auth.service');
 
 const SALT_ROUNDS = 10;
@@ -71,16 +71,11 @@ const authController = {
             const user = await User.scope('withPassword').findOne({
                 include: [
                     {
-                        association: "tags",
-                        through: {
-                            attributes: [],
-                        },
-                    },
-                    {
                         association: "channels",
                         through: {
                             attributes: [],
                         },
+                        include: "tags"
                     },
                 ],
 
@@ -99,20 +94,6 @@ const authController = {
                     message: `Your credentials are invalid.`
                 });
             }
-
-            const recommendedChannels = await Channel.findAll({
-                include: {
-                    association: "tags",
-                    through: {
-                        attributes: [],
-                    },
-                    where: {
-                        id: user.tags.map(({ id }) => id),
-                    },
-                },
-            });
-
-            user.recommendedChannels = recommendedChannels;
 
             // if the login succeed, access & refresh tokens are generated ...
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
