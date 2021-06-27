@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const { Server } = require('socket.io');
 const { createServer } = require('http')
@@ -16,6 +17,7 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 app.use(cookieParser());
+app.use(compression());
 
 const httpServer = createServer(app);
 const io = new Server(httpServer,
