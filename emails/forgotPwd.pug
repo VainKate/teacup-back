@@ -10,14 +10,14 @@ html(lang="fr")
                 h1 TeaCup
                 p Mot de passe oublié ?
             main(class='container text-center bg-white p-3 w-75 rounded')
-                - if(success)
+                - if(userExist)
                     h2.mb-3 Bonjour !
-                    p.pt-3 Nous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email. Aucune modification n'a encore été apportée, cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe: 
+                    p Nous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email. Aucune modification n'a encore été apportée, cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe: 
                     a(href=link class="fw-bold") Réinitialiser mon mot de passe
-                    p Si vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message. 
+                    p.pt-3 Si vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message. 
                 - else 
                     h2.mb-3 Bonjour !
-                    p Nous avons reçu une demande de modification de mot de passepour votre compte TeaCup associé à cette adresse email. Malheureusement il semblerait qu'aucun compte n'existe pourcette adresse. Essayez une autre adresse email ou créez un compte avec celle-ci en cliquant sur le lien ci-dessous: 
+                    p Nous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email. Malheureusement il semblerait qu'aucun compte n'existe pour cette adresse. Essayez une autre adresse email ou créez un compte avec celle-ci en cliquant sur le lien ci-dessous: 
                     a(href=link class="fw-bold") M'inscrire 
                     p.pt-3 Si vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message. 
             footer(class='text-center')

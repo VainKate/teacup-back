@@ -112,7 +112,7 @@ const userController = {
 
 
             // send a 200 status and a message to show that user has been deleted
-            res.status(200).json({
+            res.json({
                 message: `User account successfully deleted`,
             });
         } catch (error) {

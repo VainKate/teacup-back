@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const crypto = require('crypto')
 const asyncClient = require('../redisClient');
 
 
@@ -30,10 +30,10 @@ const auth = {
 
     generateTokens: async (payload, previousAccessToken) => {
         // generate both access & refresh token, sign them with JWT_SECRET and set an expiration value in seconds
-        const accessToken = await jwt.sign(payload, JWT_SECRET, {
+        const accessToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtExpiration
         });
-        const refreshToken = await jwt.sign(payload, JWT_SECRET, {
+        const refreshToken = jwt.sign(payload, JWT_SECRET, {
             expiresIn: jwtRefreshExpiration
         });
 
@@ -59,9 +59,7 @@ const auth = {
     },
 
     generateResetKey: async (payload, success) => {
-        const resetKey = await jwt.sign(payload, JWT_SECRET, {
-            expiresIn: resetKeyExpiration
-        });
+        const resetKey = crypto.randomUUID();
 
         if (success) {
             await asyncClient.setex(`${PREFIX}resetPasswordKey-email${payload.email}`,

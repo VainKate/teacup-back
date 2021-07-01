@@ -83,7 +83,7 @@ POST http://localhost:8000/v1/signup
 Content-Type: application/json
 
 {
-    "email" : "caitlin.sigrist@gmail.com",
+    "email" : "caitlin@gmail.com",
     "password" : "7357",
     "nickname" : "Kate"
 }

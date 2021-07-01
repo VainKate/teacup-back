@@ -58,17 +58,15 @@ const authController = {
             if (!email) {
                 return res
                     .status(412)
-                    .send('An email must be provided');
+                    .json({ message: 'An email must be provided' });
             }
 
             const user = await User.findOne({ where: { email } });
 
-            const success = user ? true : false;
+            const { resetKey } = await authService.generateResetKey({ email }, !!user);
+            await mailerService.sendResetPassword(email, resetKey, !!user);
 
-            const { resetKey } = await authService.generateResetKey({ email }, success);
-            await mailerService.sendResetPassword(email, resetKey, success);
-
-            res.status(200).json({
+            res.json({
                 message: `An email has been sent to ${email} with further instructions.`
             })
 
@@ -89,7 +87,7 @@ const authController = {
                 throw new Error('New password must be provided');
             }
 
-            const decoded = await jwt.verify(resetKey, JWT_SECRET);
+            const decoded = jwt.verify(resetKey, JWT_SECRET);
             const { resetKey: redisKey } = await authService.getResetKey(decoded.email);
             if (!redisKey || resetKey !== redisKey) {
                 throw new Error('Reset key is invalid');
@@ -174,7 +172,7 @@ const authController = {
             res.cookie("refresh_token", refreshToken, authService.cookieOptions);
 
             // finally, the user's data are sent without his password
-            res.status(200).json(user)
+            res.json(user)
 
         } catch (error) {
             console.log(error)
@@ -191,7 +189,7 @@ const authController = {
                 })
             }
 
-            const decoded = await jwt.verify(req.cookies.access_token, JWT_SECRET, {
+            const decoded = jwt.verify(req.cookies.access_token, JWT_SECRET, {
                 ignoreExpiration: true
             })
 
@@ -200,7 +198,7 @@ const authController = {
             res.clearCookie("access_token", authService.cookieOptions);
             res.clearCookie("refresh_token", authService.cookieOptions);
 
-            res.status(200).json({ message: 'Logout succeed' });
+            res.json({ message: 'Logout succeed' });
 
         } catch (error) {
             const message = error.parent?.detail || error.message

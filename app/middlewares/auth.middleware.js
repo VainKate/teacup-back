@@ -16,7 +16,7 @@ const verifyJWT = async (req, res, next) => {
         }
 
         // verify if the access token is conform
-        await jwt.verify(accessToken, JWT_SECRET, async (err, decodedAccessToken) => {
+        jwt.verify(accessToken, JWT_SECRET, async (err, decodedAccessToken) => {
             if (!err && decodedAccessToken) {
                 // if there is no error, the user id is saved and the access to the request is authorized
                 req.userId = decodedAccessToken.id
@@ -29,7 +29,7 @@ const verifyJWT = async (req, res, next) => {
             };
 
             // if the token is valid but expired, we now verify the refresh token
-            const decoded = await jwt.verify(refreshToken, JWT_SECRET)
+            const decoded = jwt.verify(refreshToken, JWT_SECRET)
 
             const { refreshToken: redisToken } = await authService.getRefreshToken(decoded.id, accessToken);
 
