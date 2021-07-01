@@ -83,9 +83,9 @@ POST http://localhost:8000/v1/signup
 Content-Type: application/json
 
 {
-    "email" : "tructructer@gmail.com",
-    "password" : "G PA DINSPI",
-    "nickname" : "loulou"
+    "email" : "caitlin@gmail.com",
+    "password" : "7357",
+    "nickname" : "Kate"
 }
 
 ### GET /v1/signup (error, email missing)

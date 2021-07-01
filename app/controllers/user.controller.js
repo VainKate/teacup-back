@@ -45,7 +45,7 @@ const userController = {
 
             res.status(200).json(user);
         } catch (error) {
-            const message = error.parent.detail || error.message;
+            const message = error.parent?.detail || error.message;
             res.status(500).json({ message });
         }
     },
@@ -105,8 +105,14 @@ const userController = {
                     });
             }
 
+            await authService.deleteAllRefreshToken(id);
+
+            res.clearCookie("access_token", authService.cookieOptions);
+            res.clearCookie("refresh_token", authService.cookieOptions);
+
+
             // send a 200 status and a message to show that user has been deleted
-            res.status(200).json({
+            res.json({
                 message: `User account successfully deleted`,
             });
         } catch (error) {

@@ -8,22 +8,10 @@ const socketHandler = {
             {
                 user : {
                     id : number,
-                    nickname : string
                 },
                 channel : {
                     id : number
                 },
-                onlineUsers : [
-                    {
-                    id : number,
-                    nickname : string
-                },
-                {
-                    id : number,
-                    nickname : string
-                },
-                etc
-                ]
             }
             */
             const channelKey = `channel-${channel.id}`;

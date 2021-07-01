@@ -1,8 +1,9 @@
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
-const { User, Channel } = require("../models");
+const { User } = require("../models");
 const authService = require('../services/auth.service');
+const mailerService = require("../services/mailer.service");
 
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET
@@ -50,6 +51,74 @@ const authController = {
         }
     },
 
+    forgotPwd: async (req, res) => {
+        try {
+            const { email } = req.body;
+
+            if (!email) {
+                return res
+                    .status(412)
+                    .json({ message: 'An email must be provided' });
+            }
+
+            const user = await User.findOne({ where: { email } });
+
+            const { resetKey } = await authService.generateResetKey({ email }, !!user);
+            await mailerService.sendResetPassword(email, resetKey, !!user);
+
+            res.json({
+                message: `An email has been sent to ${email} with further instructions.`
+            })
+
+        } catch (error) {
+            console.log(error)
+            const message = error.parent?.detail || error.message
+            res.status(500).json({ message });
+        }
+    },
+
+    resetPwd: async (req, res) => {
+        const { password, resetKey } = req.body;
+        try {
+            if (!resetKey) {
+                throw new Error('No reset key found');
+            }
+            if (!password) {
+                throw new Error('New password must be provided');
+            }
+
+            const decoded = jwt.verify(resetKey, JWT_SECRET);
+            const { resetKey: redisKey } = await authService.getResetKey(decoded.email);
+            if (!redisKey || resetKey !== redisKey) {
+                throw new Error('Reset key is invalid');
+            };
+
+            const user = await User.findOne({ where: { email: decoded.email } });
+            if (!user) {
+                throw new Error('This account does not exist anymore.')
+            }
+            user.password = await bcrypt.hash(password, SALT_ROUNDS)
+            await user.save();
+
+            await authService.deleteAllRefreshToken(user.id);
+            await authService.deleteResetKey(decoded.email);
+
+            res.clearCookie("access_token", authService.cookieOptions);
+            res.clearCookie("refresh_token", authService.cookieOptions);
+
+            res.json({ message: 'Password reset successfully' })
+
+        } catch (error) {
+            console.log(error)
+            res.status(403).json(error.name !== 'Error' ?
+                error :
+                {
+                    "message": error.message
+                })
+        }
+
+    },
+
     login: async (req, res) => {
         try {
             const { email, password } = req.body;
@@ -65,13 +134,14 @@ const authController = {
             const user = await User.scope('withPassword').findOne({
                 include: [
                     {
-                        association: "tags",
+                        association: "channels",
                         through: {
                             attributes: [],
                         },
+                        include: "tags"
                     },
                     {
-                        association: "channels",
+                        association: "tags",
                         through: {
                             attributes: [],
                         },
@@ -88,32 +158,21 @@ const authController = {
                 false;
 
             if (!isPasswordValid) {
+                // if there is no user with this email address or if the provided password is incorrect, the same error is returned
                 return res.status(401).json({
-                    messsage: `Your credentials are invalid.`
+                    message: `Your credentials are invalid.`
                 });
             }
 
-            const recommendedChannels = await Channel.findAll({
-                include: {
-                    association: "tags",
-                    through: {
-                        attributes: [],
-                    },
-                    where: {
-                        id: user.tags.map(({ id }) => id),
-                    },
-                },
-            });
-
-            user.recommendedChannels = recommendedChannels;
-
+            // if the login succeed, access & refresh tokens are generated ...
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
+            // and stored in httpOnly cookies.
             res.cookie("access_token", accessToken, authService.cookieOptions);
-
             res.cookie("refresh_token", refreshToken, authService.cookieOptions);
 
-            res.status(200).json(user)
+            // finally, the user's data are sent without his password
+            res.json(user)
 
         } catch (error) {
             console.log(error)
@@ -139,7 +198,7 @@ const authController = {
             res.clearCookie("access_token", authService.cookieOptions);
             res.clearCookie("refresh_token", authService.cookieOptions);
 
-            res.status(200).json({ message: 'Logout succeed' });
+            res.json({ message: 'Logout succeed' });
 
         } catch (error) {
             const message = error.parent?.detail || error.message
