@@ -71,6 +71,12 @@ const authController = {
                         },
                         include: "tags"
                     },
+                    {
+                        association: "tags",
+                        through: {
+                            attributes: [],
+                        },
+                    },
                 ],
 
                 where: {
