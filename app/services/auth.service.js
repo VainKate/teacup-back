@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto')
+const { nanoid } = require('nanoid');
 const asyncClient = require('../redisClient');
 
 
@@ -59,7 +59,7 @@ const auth = {
     },
 
     generateResetKey: async (payload, success) => {
-        const resetKey = crypto.randomUUID();
+        const resetKey = nanoid();
 
         if (success) {
             await asyncClient.setex(`${PREFIX}resetPasswordKey-email${payload.email}`,
