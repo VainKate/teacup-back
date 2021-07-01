@@ -21,7 +21,7 @@ git clone <url de ce repo>
 Puis, dans ce dossier local, installer les dépendances NPM.
 
 ```bash
-npm i
+yarn
 ```
 
 Créer une base de données PostgreSQL et exécuter le fichier de seeding db-generate (`./data/db-generate.js`). 
