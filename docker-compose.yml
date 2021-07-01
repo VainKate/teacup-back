@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    container_name: teacup_postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - teacup-data:/data/teacup/db
+
+  redis:
+    image: redis
+    container_name: teacup_redis
+    ports:
+      - '6379:6379'
+
+volumes:
+  teacup-data:

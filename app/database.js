@@ -1,31 +1,14 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config()
 
-const options = process.env.NODE_ENV === 'production' ? {
-    dialectOptions: {
-        ssl: {
-            require: true,
-            rejectUnauthorized: false
-        }
-    },
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
     define: {
         timestamps: true,
         underscored: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at'
     }
-} :
-    {
-        define: {
-            timestamps: true,
-            underscored: true,
-            createdAt: 'created_at',
-            updatedAt: 'updated_at'
-        }
-    }
-
-
-const sequelize = new Sequelize(process.env.DATABASE_URL, options);
+});
 
 // -----------------------------------
 
