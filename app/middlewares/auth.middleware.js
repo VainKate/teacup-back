@@ -10,35 +10,47 @@ const verifyJWT = async (req, res, next) => {
     const refreshToken = req.cookies.refresh_token || null;
 
     try {
+        // check if both access & refresh token exists, otherwise, the user is not logged
         if (!accessToken && !refreshToken) {
             throw new Error('No token found');
         }
 
+        // verify if the access token is conform
         await jwt.verify(accessToken, JWT_SECRET, async (err, decodedAccessToken) => {
             if (!err && decodedAccessToken) {
+                // if there is no error, the user id is saved and the access to the request is authorized
                 req.userId = decodedAccessToken.id
                 return next()
             };
 
             if (err.name !== 'TokenExpiredError') {
+                // if there is any error other than the expiration of the token, the token is compromised
                 throw err;
             };
 
+<<<<<<< HEAD
 
+=======
+            // if the token is valid but expired, we now verify the refresh token
+>>>>>>> fcb1ff484e6b5457eed8b6647e33376cb3fdff75
             const decoded = await jwt.verify(refreshToken, JWT_SECRET)
 
             const { refreshToken: redisToken } = await authService.getRefreshToken(decoded.id, accessToken);
 
+            // and compare it with the stored refresh token
             if (redisToken !== refreshToken) {
+                // if they does not match, the user's refresh token is probably a hack attempt, the request is denied
                 throw new Error("refresh token is invalid or expired");
             };
 
+            // otherwise, the refresh token is valid, we can generate new access & refresh token and save the new refresh token in redis
             const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await authService.generateTokens({ id: decoded.id }, accessToken);
 
-                res.cookie("access_token", newAccessToken, authService.cookieOptions);
+            res.cookie("access_token", newAccessToken, authService.cookieOptions);
 
-                res.cookie("refresh_token", newRefreshToken, authService.cookieOptions);
+            res.cookie("refresh_token", newRefreshToken, authService.cookieOptions);
 
+            // finally we save the user's id and authorize the request
             req.userId = decoded.id;
             next();
         })

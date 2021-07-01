@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
-const { User, Channel } = require("../models");
+const { User } = require("../models");
 const authService = require('../services/auth.service');
 const mailerService = require("../services/mailer.service");
 
@@ -139,13 +139,14 @@ const authController = {
             const user = await User.scope('withPassword').findOne({
                 include: [
                     {
-                        association: "tags",
+                        association: "channels",
                         through: {
                             attributes: [],
                         },
+                        include: "tags"
                     },
                     {
-                        association: "channels",
+                        association: "tags",
                         through: {
                             attributes: [],
                         },
@@ -162,31 +163,20 @@ const authController = {
                 false;
 
             if (!isPasswordValid) {
+                // if there is no user with this email address or if the provided password is incorrect, the same error is returned
                 return res.status(401).json({
-                    messsage: `Your credentials are invalid.`
+                    message: `Your credentials are invalid.`
                 });
             }
 
-            const recommendedChannels = await Channel.findAll({
-                include: {
-                    association: "tags",
-                    through: {
-                        attributes: [],
-                    },
-                    where: {
-                        id: user.tags.map(({ id }) => id),
-                    },
-                },
-            });
-
-            user.recommendedChannels = recommendedChannels;
-
+            // if the login succeed, access & refresh tokens are generated ...
             const { accessToken, refreshToken } = await authService.generateTokens({ id: user.id });
 
+            // and stored in httpOnly cookies.
             res.cookie("access_token", accessToken, authService.cookieOptions);
-
             res.cookie("refresh_token", refreshToken, authService.cookieOptions);
 
+            // finally, the user's data are sent without his password
             res.status(200).json(user)
 
         } catch (error) {
