@@ -63,7 +63,7 @@ const authController = {
 
             const user = await User.findOne({ where: { email } });
 
-            const { resetKey } = await authService.generateResetKey({ email }, !!user);
+            const resetKey = await authService.generateResetKey(email, !!user);
             await mailerService.sendResetPassword(email, resetKey, !!user);
 
             res.json({
@@ -87,13 +87,10 @@ const authController = {
                 throw new Error('New password must be provided');
             }
 
-            const decoded = jwt.verify(resetKey, JWT_SECRET);
-            const { resetKey: redisKey } = await authService.getResetKey(decoded.email);
-            if (!redisKey || resetKey !== redisKey) {
-                throw new Error('Reset key is invalid');
-            };
+            // const decoded = jwt.verify(resetKey, JWT_SECRET);
+            const email = await authService.getResetEmail(resetKey);
 
-            const user = await User.findOne({ where: { email: decoded.email } });
+            const user = await User.findOne({ where: { email } });
             if (!user) {
                 throw new Error('This account does not exist anymore.')
             }
@@ -101,7 +98,7 @@ const authController = {
             await user.save();
 
             await authService.deleteAllRefreshToken(user.id);
-            await authService.deleteResetKey(decoded.email);
+            await authService.deleteResetKey(resetKey);
 
             res.clearCookie("access_token", authService.cookieOptions);
             res.clearCookie("refresh_token", authService.cookieOptions);
