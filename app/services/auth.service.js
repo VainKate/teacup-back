@@ -14,8 +14,8 @@ const jwtRefreshExpiration = process.env.NODE_ENV === 'production' ?
     60 * 60 * 24 * 30 : 60 * 5;
 const refreshTokenMaxAge = new Date() + jwtRefreshExpiration;
 
-const resetTokenExpiration = process.env.NODE_ENV === 'production' ?
-    60 * 60 * 24 : 60;
+const resetKeyExpiration = process.env.NODE_ENV === 'production' ?
+    60 * 60 * 24 : 120;
 
 const auth = {
     cookieOptions: process.env.NODE_ENV === 'production' ?
@@ -58,21 +58,35 @@ const auth = {
             }))
     },
 
-    generateResetToken: async (payload, success) => {
-        const resetToken = await jwt.sign(payload, JWT_SECRET, {
-            expiresIn: resetTokenExpiration
+    generateResetKey: async (payload, success) => {
+        const resetKey = await jwt.sign(payload, JWT_SECRET, {
+            expiresIn: resetKeyExpiration
         });
 
         if (success) {
-            await asyncClient.setex(`${PREFIX}resetPasswordToken-email${payload.email}`,
+            await asyncClient.setex(`${PREFIX}resetPasswordKey-email${payload.email}`,
                 jwtRefreshExpiration,
                 JSON.stringify({
-                    resetToken,
-                    expires: new Date() + resetTokenExpiration
+                    resetKey,
+                    expires: new Date() + resetKeyExpiration
                 }))
         };
 
-        return { resetToken }
+        return { resetKey }
+    },
+
+    getResetKey: async (email) => {
+        const resetKey = await asyncClient.get(`${PREFIX}resetPasswordKey-email${email}`);
+
+        if (!resetKey) {
+            throw new Error("refresh token is invalid or expired")
+        };
+
+        return JSON.parse(resetKey)
+    },
+
+    deleteResetKey: async (email) => {
+        await asyncClient.del(`${PREFIX}resetPasswordKey-email${email}`);
     },
 
     getRefreshToken: async (userId, accessToken) => {

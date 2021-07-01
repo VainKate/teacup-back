@@ -22,12 +22,14 @@ const transporterOptions = process.env.NODE_ENV === 'production' ?
 const transporter = nodemailer.createTransport(transporterOptions);
 
 const mailerService = {
-    sendResetPassword: async (email, success) => {
+    sendResetPassword: async (email, resetKey, success) => {
         try {
             const html = new Email();
-            const signupLink = 'https://teacup.quillers.fr';
-            const resetLink = ' http://localhost:8080/newpassword.html';
-            // const resetLink = ' https://teacup.quillers.fr/newpassword.html';
+            const signupLink = process.env.NODE_ENV === 'production' ? 'https://teacup.minervas.space'
+                : 'http://localhost:3000/';
+            const resetLink = process.env.NODE_ENV === 'production' ? `https://teacup.minervas.space/reset/${resetKey}`
+                : `http://localhost:3000/reset/${resetKey}`;
+
 
             const emailTemplate = await html.render('forgotPwd', {
                 success,
@@ -50,6 +52,7 @@ const mailerService = {
 
 
         } catch (error) {
+            console.log('hey')
             console.error(error);
 
             const message = error.parent?.detail || error.message

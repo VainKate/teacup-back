@@ -65,16 +65,16 @@ const authController = {
 
             const success = user ? true : false;
 
-            await mailerService.sendResetPassword(email, success);
-            const { resetToken } = await authService.generateResetToken({ email }, success);
-
-            res.cookie("reset_token", resetToken, authService.cookieOptions);
+            const { resetKey } = await authService.generateResetKey({ email }, success);
+            console.log(resetKey)
+            await mailerService.sendResetPassword(email, resetKey, success);
 
             res.status(200).json({
                 message: `An email has been sent to ${email} with further instructions.`
             })
 
         } catch (error) {
+            console.log('oh')
             console.log(error)
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
@@ -82,39 +82,38 @@ const authController = {
     },
 
     resetPwd: async (req, res) => {
-        const resetToken = req.cookies.access_token || null;
-        const { password } = req.body;
-
+        const { password, resetKey } = req.body;
         try {
-            if (!resetToken) {
-                throw new Error('No reset token found');
+            if (!resetKey) {
+                throw new Error('No reset key found');
             }
-
             if (!password) {
                 throw new Error('New password must be provided');
             }
 
-            const decoded = await jwt.verify(resetToken, JWT_SECRET);
-
-            const { resetToken: redisToken } = await authService.getResetToken(decoded.email, resetToken);
-
-            if (resetToken !== redisToken) {
-                throw new Error('Reset token is invalid');
+            const decoded = await jwt.verify(resetKey, JWT_SECRET);
+            const { resetKey: redisKey } = await authService.getResetKey(decoded.email);
+            if (!redisKey || resetKey !== redisKey) {
+                throw new Error('Reset key is invalid');
             };
 
-            const user = User.findOne({ email: decoded.email });
-
+            const user = await User.findOne({ where: { email: decoded.email } });
             if (!user) {
                 throw new Error('This account does not exist anymore.')
             }
-
             user.password = await bcrypt.hash(password, SALT_ROUNDS)
-
             await user.save();
 
-            res.clearCookie("reset_token", authService.cookieOptions);
+            await authService.deleteAllRefreshToken(user.id);
+            await authService.deleteResetKey(decoded.email);
+
+            res.clearCookie("access_token", authService.cookieOptions);
+            res.clearCookie("refresh_token", authService.cookieOptions);
+
+            res.json({ message: 'Password reset successfully' })
 
         } catch (error) {
+            console.log(error)
             res.status(403).json(error.name !== 'Error' ?
                 error :
                 {
