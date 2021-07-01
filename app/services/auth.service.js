@@ -58,33 +58,30 @@ const auth = {
             }))
     },
 
-    generateResetKey: async (payload, success) => {
+    generateResetKey: async (email, success) => {
         const resetKey = nanoid();
 
         if (success) {
-            await asyncClient.setex(`${PREFIX}resetPasswordKey-email${payload.email}`,
+            await asyncClient.setex(`${PREFIX}resetPasswordKey-email${resetKey}`,
                 jwtRefreshExpiration,
-                JSON.stringify({
-                    resetKey,
-                    expires: new Date() + resetKeyExpiration
-                }))
+                email)
         };
 
-        return { resetKey }
+        return resetKey;
     },
 
-    getResetKey: async (email) => {
-        const resetKey = await asyncClient.get(`${PREFIX}resetPasswordKey-email${email}`);
+    getResetEmail: async (resetKey) => {
+        const email = await asyncClient.get(`${PREFIX}resetPasswordKey-email${resetKey}`);
 
-        if (!resetKey) {
-            throw new Error("refresh token is invalid or expired")
+        if (!email) {
+            throw new Error("Reset key is invalid or expired")
         };
 
-        return JSON.parse(resetKey)
+        return email
     },
 
-    deleteResetKey: async (email) => {
-        await asyncClient.del(`${PREFIX}resetPasswordKey-email${email}`);
+    deleteResetKey: async (resetKey) => {
+        await asyncClient.del(`${PREFIX}resetPasswordKey-email${resetKey}`);
     },
 
     getRefreshToken: async (userId, accessToken) => {
