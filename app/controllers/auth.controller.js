@@ -66,7 +66,6 @@ const authController = {
             const success = user ? true : false;
 
             const { resetKey } = await authService.generateResetKey({ email }, success);
-            console.log(resetKey)
             await mailerService.sendResetPassword(email, resetKey, success);
 
             res.status(200).json({
@@ -74,7 +73,6 @@ const authController = {
             })
 
         } catch (error) {
-            console.log('oh')
             console.log(error)
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });

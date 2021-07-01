@@ -4,20 +4,24 @@ html(lang="fr")
         meta(http-equiv="X-UA-Compatible" content="IE=edge")
         meta(name="viewport" content="width=device-width, initial-scale=1.0")
         link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous")
+        //- link(rel='stylesheet', href='https://fonts.googleapis.com/css2?family=Quicksand&display=swap', type='text/css')
     body 
-    header
-        main
-            - if(success)
-                em Bonjour ! 
-                p Nous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email. Aucune modification n'a encore été apportée, cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe: 
-                a(href=link)  Réinitialiser mon mot de passe
-                p Si vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message. 
-                span L'équipe TeaCup
-            - else 
-                em Bonjour ! 
-                p Nous avons reçu une demande de modification de mot de passe pour votre compte TeaCup associé à cette adresse email. Malheureusement il semblerait qu'aucun compte n'existe pour cette adresse. Essayez une autre adresse email ou créez un compte avec celle-ci en cliquant sur le lien ci-dessous: 
-                a(href=link)  M'inscrire 
-                p Si vous n'êtes pas à l'origine de cette requête, veuillez ne pas tenir compte de ce message. 
+        .container(class='bg-warning h-100 p-3 d-flex flex-column justify-content-between align-items-center')
+            header(class='text-center')
+                h1 TeaCup
+                p Mot de passe oublié ?
+            main(class='container text-center bg-white p-3 w-75')
+                - if(success)
+                    h2.mb-3 Bonjour !
+                    p.pt-3 Nous avons reçu une demande de modification de mot de passepour      votre compte TeaCup associé à cette adresse email.Aucune   modification   n'a encore été apportée, cliquez sur lelien   ci-dessous pour  réinitialiser votre mot de passe: 
+                    a(href=link class="text-warning fw-bold")  Réinitialiser mon mot de passe
+                    p Si vous n'êtes pas à l'origine de cette requête, veuillez nepas      tenir compte de ce message. 
+                - else 
+                    h2.mb-3 Bonjour !
+                    p Nous avons reçu une demande de modification de mot de passepour      votre compte TeaCup associé à cette adresse email.Malheureusement  il    semblerait qu'aucun compte n'existe pourcette adresse.    Essayez une    autre adresse email ou créezun compte avec celle-ci    en cliquant sur le    lienci-dessous: 
+                    a(href=link class="text-warning fw-bold")  M'inscrire 
+                    p.pt-3 Si vous n'êtes pas à l'origine de cette requête, veuillez nepas      tenir compte de ce message. 
+            footer(class='text-center')
                 span L'équipe TeaCup 
 
 

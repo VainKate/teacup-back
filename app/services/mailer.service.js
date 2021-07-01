@@ -52,11 +52,8 @@ const mailerService = {
 
 
         } catch (error) {
-            console.log('hey')
             console.error(error);
-
-            const message = error.parent?.detail || error.message
-            res.status(400).json({ message });
+            return error
         }
     }
 };
