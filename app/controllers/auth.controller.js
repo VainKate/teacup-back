@@ -87,8 +87,10 @@ const authController = {
                 throw new Error('New password must be provided');
             }
 
-            // const decoded = jwt.verify(resetKey, JWT_SECRET);
             const email = await authService.getResetEmail(resetKey);
+            if (!email) {
+                throw new Error('No reset key found');
+            }
 
             const user = await User.findOne({ where: { email } });
             if (!user) {

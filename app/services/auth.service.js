@@ -58,7 +58,7 @@ const auth = {
             }))
     },
 
-    generateResetKey: async (payload, success) => {
+    generateResetKey: async (email, success) => {
         const resetKey = nanoid();
 
         if (success) {
