@@ -1,4 +1,4 @@
-const { Channel, User } = require('../models');
+const { Channel } = require('../models');
 const usersStatus = require('./usersStatus.service');
 
 const socketHandler = {
@@ -22,8 +22,6 @@ const socketHandler = {
                 const currentChannel = await Channel.findByPk(channel.id);
                 await currentChannel.addUser(user.id);
 
-                await usersStatus.addToOnlineList(channelKey, user.id);
-
                 const socketsCount = await usersStatus.addSocketToList(channelKey, socket.id, user.id)
 
                 // send confirmation to front that user had join the channel
@@ -31,8 +29,9 @@ const socketHandler = {
 
                 // If user did not already had an active socket for this room, we can tell front to add him to online user list
                 if (socketsCount === 1) {
+                    await usersStatus.addToOnlineList(channelKey, user.id);
                     // key 'user-join' to tell front to add user to online user list
-                    io.to(channelKey).emit('user:join', { channel, user });
+                    io.to(channelKey).emit('user:join', { user });
                 }
 
             } catch (err) {
@@ -49,7 +48,7 @@ const socketHandler = {
                 id : string (messageId) (have to be send)
                 user : {
                     id : number,
-                    nickname : string
+                    nickname: string
                 }
                 channel : {
                     id : number
@@ -81,9 +80,6 @@ const socketHandler = {
 
                     // key 'user-leave' to tell front to shift user from online user list to offline user list
                     io.to(channelKey).emit('user:leave', {
-                        channel: {
-                            id: parseInt(channelKey.slice(8))
-                        },
                         user: {
                             id: parseInt(userId)
                         }
