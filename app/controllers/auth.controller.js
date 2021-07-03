@@ -78,22 +78,29 @@ const authController = {
     },
 
     resetPwd: async (req, res) => {
-        const { password, resetKey } = req.body;
+        const { email, password, resetKey } = req.body;
         try {
-            if (!resetKey) {
-                throw new Error('No reset key found');
-            }
-            if (!password) {
-                throw new Error('New password must be provided');
+            if (!resetKey || !password || !email) {
+                const error = !resetKey
+                    ? 'No reset key found.' :
+                    !password
+                        ? 'New password must be provided.'
+                        : 'No email found.';
+
+                throw new Error(error);
             }
 
-            // const decoded = jwt.verify(resetKey, JWT_SECRET);
-            const email = await authService.getResetEmail(resetKey);
+            const redisEmail = await authService.getResetEmail(resetKey);
+
+            if (redisEmail !== email) {
+                throw new Error('Incorrect mail address provided.');
+            }
 
             const user = await User.findOne({ where: { email } });
             if (!user) {
                 throw new Error('This account does not exist anymore.')
             }
+
             user.password = await bcrypt.hash(password, SALT_ROUNDS)
             await user.save();
 
