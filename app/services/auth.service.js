@@ -63,7 +63,7 @@ const auth = {
 
         if (success) {
             await asyncClient.setex(`${PREFIX}resetPasswordKey-email${resetKey}`,
-                jwtRefreshExpiration,
+                resetKeyExpiration,
                 email)
         };
 
