@@ -252,6 +252,7 @@ const userController = {
 
                 recommendedChannels.sort((a, b) => {
                     return b.tags.filter(tag => tag.matchingTag).length - a.tags.filter(tag => tag.matchingTag).length
+                        || b.dataValues.usersCount - a.dataValues.usersCount
                 })
             } else {
                 const channels = await Channel.findAll({
