@@ -10,23 +10,56 @@ Content-Type: application/json
 
 #------------------------------------------------
 
-### DELETE /v1/me/channels/:id
-DELETE http://localhost:8000/v1/me/channels/11
-Content-Type: application/json
-
-### DELETE /v1/me/channels/:id
-DELETE http://localhost:8000/v1/me/channels/10
-Content-Type: application/json
-
-### DELETE /v1/me/channels/:id
-DELETE http://localhost:8000/v1/me/channels/1000
+### GET /v1/me/recommended 
+GET http://localhost:8000/v1/me/recommended
 Content-Type: application/json
 
 #------------------------------------------------
 
-### GET /v1/me/recommended 
-GET http://localhost:8000/v1/me/recommended
+### DELETE /v1/me/channels/:id (success)
+DELETE http://localhost:8000/v1/me/channels/11
 Content-Type: application/json
+
+### DELETE /v1/me/channels/:id (unjoined channel)
+DELETE http://localhost:8000/v1/me/channels/10
+Content-Type: application/json
+
+### DELETE /v1/me/channels/:id (channel does not exists)
+DELETE http://localhost:8000/v1/me/channels/1000
+Content-Type: application/json
+
+### DELETE /v1/me/channels/:id (incorrect channel id)
+DELETE http://localhost:8000/v1/me/channels/ten
+Content-Type: application/json
+
+#------------------------------------------------
+
+### PATCH /v1/me (success)
+PATCH http://localhost:8000/v1/me
+Content-Type: application/json
+
+{
+    "password" : "test",
+    "newPassword" : "test"
+
+}
+
+### PATCH /v1/me (missing old password)
+PATCH http://localhost:8000/v1/me
+Content-Type: application/json
+
+{
+    "newPassword" : "supahaka@testmail.com"
+}
+
+### PATCH /v1/me (old password incorrect)
+PATCH http://localhost:8000/v1/me
+Content-Type: application/json
+
+{
+    "password" : "supahaka@testmail.com",
+    "newPassword" : "test"
+}
 
 #------------------------------------------------
 
@@ -64,35 +97,6 @@ Content-Type: application/json
 
 {
     "email" : "supahaka@testmail.com"
-}
-
-#------------------------------------------------
-
-### PATCH /v1/me (success)
-PATCH http://localhost:8000/v1/me
-Content-Type: application/json
-
-{
-    "password" : "test",
-    "newPassword" : "test"
-
-}
-
-### PATCH /v1/me (missing old password)
-PATCH http://localhost:8000/v1/me
-Content-Type: application/json
-
-{
-    "newPassword" : "supahaka@testmail.com"
-}
-
-### PATCH /v1/me (old password incorrect)
-PATCH http://localhost:8000/v1/me
-Content-Type: application/json
-
-{
-    "password" : "supahaka@testmail.com",
-    "newPassword" : "test"
 }
 
 #------------------------------------------------

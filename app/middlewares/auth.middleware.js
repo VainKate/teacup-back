@@ -9,14 +9,15 @@ const verifyJWT = async (req, res, next) => {
     const accessToken = req.cookies.access_token || null;
     const refreshToken = req.cookies.refresh_token || null;
 
-    try {
-        // check if both access & refresh token exists, otherwise, the user is not logged
-        if (!accessToken && !refreshToken) {
-            throw new Error('No token found');
-        }
+    // check if both access & refresh token exists, otherwise, the user is not logged
+    if (!accessToken && !refreshToken) {
+        // throw new Error('No token found'); // OK
+        return res.status(401).json({ message: 'No token found' })
+    }
 
-        // verify if the access token is conform
-        jwt.verify(accessToken, JWT_SECRET, async (err, decodedAccessToken) => {
+    // verify if the access token is conform
+    jwt.verify(accessToken, JWT_SECRET, async (err, decodedAccessToken) => {
+        try {
             if (!err && decodedAccessToken) {
                 // if there is no error, the user id is saved and the access to the request is authorized
                 req.userId = decodedAccessToken.id
@@ -29,6 +30,7 @@ const verifyJWT = async (req, res, next) => {
             };
 
             // if the token is valid but expired, we now verify the refresh token
+            // try {
             const decoded = jwt.verify(refreshToken, JWT_SECRET)
 
             const { refreshToken: redisToken } = await authService.getRefreshToken(decoded.id, accessToken);
@@ -49,18 +51,15 @@ const verifyJWT = async (req, res, next) => {
             // finally we save the user's id and authorize the request
             req.userId = decoded.id;
             next();
-        })
-    }
-
-    catch (error) {
-        console.log(error)
-        res.status(401).json(error.name !== 'Error' ?
-            error :
-            {
-                "message": error.message
-            })
-    }
-
-};
+        }
+        catch (error) {
+            res.status(401).json(error.name !== 'Error' ?
+                error :
+                {
+                    "message": error.message
+                })
+        }
+    })
+}
 
 module.exports = verifyJWT;

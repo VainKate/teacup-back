@@ -71,7 +71,6 @@ const authController = {
             })
 
         } catch (error) {
-            console.log(error)
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }
@@ -108,7 +107,6 @@ const authController = {
             res.json({ message: 'Password reset successfully' })
 
         } catch (error) {
-            console.log(error)
             res.status(403).json(error.name !== 'Error' ?
                 error :
                 {
@@ -174,7 +172,6 @@ const authController = {
             res.json(user)
 
         } catch (error) {
-            console.log(error)
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
         }

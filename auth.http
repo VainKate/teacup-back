@@ -33,7 +33,3 @@ Content-Type: application/json
 ### GET /v1/logout
 POST http://localhost:8000/v1/logout
 Content-Type: application/json
-
-{
-    "id" : 51
-}
