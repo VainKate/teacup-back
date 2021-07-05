@@ -63,7 +63,7 @@ const auth = {
 
         if (success) {
             await asyncClient.setex(`${PREFIX}resetPasswordKey-email${resetKey}`,
-                jwtRefreshExpiration,
+                resetKeyExpiration,
                 email)
         };
 
@@ -74,7 +74,7 @@ const auth = {
         const email = await asyncClient.get(`${PREFIX}resetPasswordKey-email${resetKey}`);
 
         if (!email) {
-            throw new Error("Reset key is invalid or expired")
+            throw new Error("Reset key is invalid or expired.")
         };
 
         return email
