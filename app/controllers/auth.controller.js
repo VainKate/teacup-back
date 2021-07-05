@@ -63,8 +63,10 @@ const authController = {
 
             const user = await User.findOne({ where: { email } });
 
-            const resetKey = await authService.generateResetKey(email, !!user);
-            await mailerService.sendResetPassword(email, resetKey, !!user);
+            if (user) {   
+                const resetKey = await authService.generateResetKey(email, !!user);
+                await mailerService.sendResetPassword(email, resetKey, !!user);
+            }
 
             res.json({
                 message: `An email has been sent to ${email} with further instructions.`
