@@ -82,37 +82,28 @@ const authController = {
         const { email, password, resetKey } = req.body;
         try {
             if (!resetKey || !password || !email) {
-                const error = !resetKey
-                    ? 'No reset key found.' :
-                    !password
-                        ? 'New password must be provided.'
-                        : 'No email found.';
-
-                throw new Error(error);
+                return res
+                    .status(412)
+                    .json({
+                        message: "Missing information."
+                    });
             }
 
             const redisEmail = await authService.getResetEmail(resetKey);
-
-            if (redisEmail !== email) {
-                throw new Error('Incorrect mail address provided.');
-            }
-
             const user = await User.findOne({ where: { email } });
-            if (!user) {
-                throw new Error('This account does not exist anymore.')
+
+            if (user && redisEmail === email) {   
+                user.password = await bcrypt.hash(password, SALT_ROUNDS)
+                await user.save();
+                
+                await authService.deleteAllRefreshToken(user.id);
+                await authService.deleteResetKey(resetKey);
+                
+                res.clearCookie("access_token", authService.cookieOptions);
+                res.clearCookie("refresh_token", authService.cookieOptions);
             }
-
-            user.password = await bcrypt.hash(password, SALT_ROUNDS)
-            await user.save();
-
-            await authService.deleteAllRefreshToken(user.id);
-            await authService.deleteResetKey(resetKey);
-
-            res.clearCookie("access_token", authService.cookieOptions);
-            res.clearCookie("refresh_token", authService.cookieOptions);
 
             res.json({ message: 'Password reset successfully' })
-
         } catch (error) {
             res.status(403).json(error.name !== 'Error' ?
                 error :
