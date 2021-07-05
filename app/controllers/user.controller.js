@@ -43,7 +43,7 @@ const userController = {
 
             await user.reload();
 
-            res.status(200).json(user);
+            res.json(user);
         } catch (error) {
             const message = error.parent?.detail || error.message;
             res.status(500).json({ message });
@@ -96,9 +96,9 @@ const userController = {
             // delete the user
             const deleted = await User.destroy({ where: { id } });
 
-            if (deleted !== 0) {   
+            if (deleted !== 0) {
                 await authService.deleteAllRefreshToken(id);
-                
+
                 res.clearCookie("access_token", authService.cookieOptions);
                 res.clearCookie("refresh_token", authService.cookieOptions);
             }
@@ -124,7 +124,7 @@ const userController = {
                 },
             });
 
-            res.status(200).json(user);
+            res.json(user);
         } catch (error) {
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
@@ -159,7 +159,7 @@ const userController = {
                 }
             });
 
-            res.status(200).json(channels);
+            res.json(channels);
         } catch (error) {
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
@@ -176,7 +176,7 @@ const userController = {
 
             await channel.removeUser(req.userId);
 
-            res.status(200).json({ message: 'Channel removed successfully' });
+            res.json({ message: 'Channel removed successfully' });
         } catch (error) {
             const message = error.parent?.detail || error.message
             res.status(500).json({ message });
@@ -266,13 +266,20 @@ const userController = {
                             attributes: []
                         }
                     ],
-                    order: Sequelize.literal('"usersCount" DESC')
+                    where: {
+                        id: {
+                            [Op.and]: [{
+                                [Op.notIn]: user.channels.map(({ id }) => id)
+                            }]
+                        }
+                    },
+                    order: [[Sequelize.col('usersCount'), 'DESC'],]
                 });
 
                 recommendedChannels = channels.slice(0, 15);
             }
 
-            res.status(200).json(recommendedChannels);
+            res.json(recommendedChannels);
         } catch (error) {
             console.error(error)
             const message = error.parent?.detail || error.message
